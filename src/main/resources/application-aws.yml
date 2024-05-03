@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://groshare-mysql-dev.chu8uqscq6w5.us-east-1.rds.amazonaws.com:3306/groshare?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: safenet
+    password: safenet2024
