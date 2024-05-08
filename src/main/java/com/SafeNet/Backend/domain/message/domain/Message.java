@@ -37,6 +37,6 @@ public class Message {
     private LocalDateTime sentTime;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "room_id", referencedColumnName = "room_id")
+    @JoinColumn(name = "room_id", referencedColumnName = "room_id", insertable = false, updatable = false)
     private MessageRoom messageRoom;
 }
