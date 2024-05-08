@@ -1,7 +1,7 @@
 package com.SafeNet.Backend.domain.messageRoom.service;
 
 import com.SafeNet.Backend.domain.member.domain.Member;
-import com.SafeNet.Backend.domain.member.repository.UserRepository;
+import com.SafeNet.Backend.domain.member.repository.MemberRepository;
 import com.SafeNet.Backend.domain.message.domain.Message;
 import com.SafeNet.Backend.domain.message.dto.MessageRequestDto;
 import com.SafeNet.Backend.domain.message.dto.MessageResponseDto;
@@ -31,7 +31,7 @@ public class MessageRoomService {
     private final MessageRoomRepository messageRoomRepository;
     private final MessageRepository messageRepository;
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
 
     // 쪽지방(topic)에 발행되는 메시지를 처리하는 리스너
     private final RedisMessageListenerContainer redisMessageListener;
@@ -166,7 +166,7 @@ public class MessageRoomService {
         );
 
         // 사용자 조회
-        Member receiver = userRepository.findById(post.getMember().getId()).orElseThrow(
+        Member receiver = memberRepository.findById(post.getMember().getId()).orElseThrow(
                 () -> new IllegalArgumentException("해당 게시물에 사용자가 존재하지 않습니다")
         );
 
