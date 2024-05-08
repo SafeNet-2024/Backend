@@ -25,7 +25,7 @@ public class MessageRoomDto implements Serializable {
 
     public static MessageRoomDto createMessageRoom(MessageRequestDto messageRequestDto, Member member) {
         return MessageRoomDto.builder()
-                .roomName(member.getName())  // roomName을 sender의 이름으로 설정
+                .roomName(messageRequestDto.getReceiver())  // roomName을 receiver의 이름으로 설정
                 .roomId(UUID.randomUUID().toString())
                 .sender(member.getName())
                 .receiver(messageRequestDto.getReceiver())
