@@ -1,7 +1,6 @@
-package com.SafeNet.Backend.global.config;
+package com.SafeNet.Backend.global.config.msg;
 
 import com.SafeNet.Backend.domain.message.dto.MessageDto;
-import com.SafeNet.Backend.domain.message.dto.MessageResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,6 +35,7 @@ public class RedisConfig {
         redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(String.class)); // Value Serializer
         return redisTemplate;
     }
+
     /**
      * Redis에 메시지 내역을 저장하기 위한 template설정
      */
