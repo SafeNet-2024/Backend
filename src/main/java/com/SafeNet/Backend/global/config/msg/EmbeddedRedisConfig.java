@@ -1,4 +1,4 @@
-package com.SafeNet.Backend.global.config;
+package com.SafeNet.Backend.global.config.msg;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;

@@ -1,4 +1,4 @@
-package com.SafeNet.Backend.global.config;
+package com.SafeNet.Backend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
