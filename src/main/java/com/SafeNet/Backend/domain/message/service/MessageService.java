@@ -24,9 +24,7 @@ public class MessageService {
     private final MessageRoomRepository messageRoomRepository;
 
     public void saveMessage(MessageDto messageDto) {
-        MessageRoom messageRoom = messageRoomRepository.findById(Long.valueOf(messageDto.getRoomId()))
-                .orElseThrow(() -> new IllegalArgumentException("Invalid room ID"));
-
+        MessageRoom messageRoom = messageRoomRepository.findByRoomId(messageDto.getRoomId());
         Message message = Message.builder()
                 .sender(messageDto.getSender())
                 .messageRoom(messageRoom)
