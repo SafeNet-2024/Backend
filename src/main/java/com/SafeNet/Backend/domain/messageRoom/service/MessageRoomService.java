@@ -158,22 +158,18 @@ public class MessageRoomService {
      * sender와 receiver만 해당 쪽지방을 조회할 수 있다.
      */
     public MessageRoomDto findRoom(String roomId, Member member) {
-        MessageRoom messageRoom = messageRoomRepository.findByRoomId(roomId);
+        MessageRoom messageRoom = messageRoomRepository.findByRoomId(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 쪽지방이 존재하지 않습니다."));
 
-        // 게시글 조회
-        Post post = postRepository.findById(messageRoom.getPost().getId()).orElseThrow(
-                () -> new IllegalArgumentException("해당 게시물이 존재하지 않습니다")
-        );
+        // 게시글 검증 없이 메시지룸의 post 참조
+        Post post = messageRoom.getPost();
+        if (post == null) {
+            throw new IllegalArgumentException("쪽지방에 연결된 게시물이 존재하지 않습니다.");
+        }
 
-        // 사용자 조회
-        Member receiver = memberRepository.findById(post.getMember().getId()).orElseThrow(
-                () -> new IllegalArgumentException("해당 게시물에 사용자가 존재하지 않습니다")
-        );
-
-        // sender & receiver 모두 messageRoom 조회 가능
-        messageRoom = messageRoomRepository.findByRoomIdAndMemberOrRoomIdAndReceiver(roomId, member, roomId, receiver.getName());
-        if (messageRoom == null) {
-            throw new IllegalArgumentException("해당 쪽지방이 존재하지 않습니다");
+        // sender 또는 receiver 확인
+        if (!messageRoom.getSender().equals(member.getName()) && !messageRoom.getReceiver().equals(member.getName())) {
+            throw new IllegalArgumentException("해당 쪽지방에 접근할 권한이 없습니다.");
         }
 
         return MessageRoomDto.builder()
@@ -186,14 +182,15 @@ public class MessageRoomService {
     }
 
 
+
     /**
      * 쪽지방 삭제
      * sender와 receiver가 삭제할 경우 Redis 및 DB 모두 삭제
      * sender나 receiver가 삭제할 경우 sender나 receiver가 "Not_Exist_Receiver(Sender)"로 변경됨
      * member는 더이상 해당 채팅방을 조회하지 못함.
      */
-    public MessageResponseDto deleteRoom(Long id, Member member) {
-        MessageRoom messageRoom = messageRoomRepository.findByIdAndMemberOrIdAndReceiver(id, member, id, member.getName());
+    public MessageResponseDto deleteRoom(String roomId, Member member) {
+        MessageRoom messageRoom = messageRoomRepository.findByRoomIdAndMemberOrRoomIdAndReceiver(roomId, member, roomId, member.getName());
         boolean deleteFromDb = false;
         String updatedSender = messageRoom.getSender();
         String updatedReceiver = messageRoom.getReceiver();
@@ -209,31 +206,32 @@ public class MessageRoomService {
             deleteFromDb = "Not_Exist_Sender".equals(messageRoom.getSender()); // sender도 이미 삭제했는지 확인
         }
 
-        MessageRoom updatedRoom = MessageRoom.builder()
-                .id(messageRoom.getId())
-                .roomName(messageRoom.getRoomName())
-                .roomId(messageRoom.getRoomId())
-                .sender(updatedSender)
-                .receiver(updatedReceiver)
-                .member(messageRoom.getMember())
-                .post(messageRoom.getPost())
-                .createdAt(messageRoom.getCreatedAt())
-                .build();
-
         // sender와 receiver 모두 삭제했다면 DB와 Redis에서 완전히 삭제
         if (deleteFromDb) {
-            messageRoomRepository.delete(updatedRoom);
-            opsHashMessageRoom.delete(Message_Rooms, updatedRoom.getRoomId());
+            messageRoomRepository.delete(messageRoom);
+            opsHashMessageRoom.delete(Message_Rooms, messageRoom.getRoomId());
             return MessageResponseDto.builder()
-                    .message("receiver와 sender가 나간 관계로 쪽지방을 완전히 삭제했습니다.")
-                    .status(HttpStatus.OK.value()).build();
+                    .message("receiver와 sender가 모두 방을 나갔습니다.")
+                    .status(HttpStatus.OK.value())
+                    .build();
         } else {
+            MessageRoom updatedRoom = MessageRoom.builder()
+                    .id(messageRoom.getId())
+                    .roomName(updatedReceiver)
+                    .roomId(messageRoom.getRoomId())
+                    .sender(updatedSender)
+                    .receiver(updatedReceiver)
+                    .member(messageRoom.getMember())
+                    .post(messageRoom.getPost())
+                    .createdAt(messageRoom.getCreatedAt())
+                    .build();
+
             messageRoomRepository.save(updatedRoom);
             MessageRoomDto messageRoomDto = convertToDto(messageRoom);
             opsHashMessageRoom.put(Message_Rooms, messageRoomDto.getRoomId(), messageRoomDto); // Redis 업데이트
 
             return MessageResponseDto.builder()
-                    .message("쪽지방을 업데이트했습니다")
+                    .message("상대방이 방을 나갔으므로 더 이상 채팅이 불가능합니다.")
                     .status(HttpStatus.OK.value())
                     .build();
         }

@@ -144,7 +144,8 @@ class MessageServiceTest {
 
     @Test
     void testLoadMessage_FromDB() {
-        MessageRoom messageRoom = messageRoomRepository.findByRoomId(room1.getRoomId());
+        MessageRoom messageRoom = messageRoomRepository.findByRoomId(room1.getRoomId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 쪽지방이 존재하지 않습니다."));
         Message message = Message.builder()
                 .sender(userA.getName())
                 .messageRoom(messageRoom)
