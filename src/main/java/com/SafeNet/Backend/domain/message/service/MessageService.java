@@ -24,7 +24,8 @@ public class MessageService {
     private final MessageRoomRepository messageRoomRepository;
 
     public void saveMessage(MessageDto messageDto) {
-        MessageRoom messageRoom = messageRoomRepository.findByRoomId(messageDto.getRoomId());
+        MessageRoom messageRoom = messageRoomRepository.findByRoomId(messageDto.getRoomId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 쪽지방이 존재하지 않습니다."));
         Message message = Message.builder()
                 .sender(messageDto.getSender())
                 .messageRoom(messageRoom)

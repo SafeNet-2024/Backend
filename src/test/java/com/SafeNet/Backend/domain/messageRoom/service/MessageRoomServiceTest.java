@@ -110,7 +110,7 @@ class MessageRoomServiceTest {
     void deleteRoom() {
         checkRedis();
         // userA deletes the room first
-        messageRoomService.deleteRoom(room1.getId(), userA);
+        messageRoomService.deleteRoom(room1.getRoomId(), userA);
         // Check if the room is updated and not deleted after userA's deletion
         MessageRoom updatedRoom = messageRoomRepository.findById(room1.getId()).orElse(null);
         assertNotNull(updatedRoom);
@@ -121,7 +121,7 @@ class MessageRoomServiceTest {
         checkRedis();
 
         // Then userB deletes the room
-        messageRoomService.deleteRoom(room1.getId(), userB);
+        messageRoomService.deleteRoom(room1.getRoomId(), userB);
         // Check if the room is deleted from the database and Redis
         assertThat(messageRoomRepository.findById(room1.getId())).isEmpty();
 
