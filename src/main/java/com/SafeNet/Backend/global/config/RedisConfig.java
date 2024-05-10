@@ -1,3 +1,4 @@
+/*
 package com.SafeNet.Backend.global.config;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -35,4 +36,4 @@ public class RedisConfig {
         return redisTemplate;
     }
 
-}
+}*/

@@ -1,3 +1,4 @@
+/*
 package com.SafeNet.Backend.global.auth;
 
 import io.jsonwebtoken.Claims;
@@ -30,9 +31,11 @@ public class JwtTokenProvider {
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
-    /**
+    */
+/**
      * Access 토큰 생성
-     */
+     *//*
+
     public String createAccessToken(Authentication authentication){
         Claims claims = Jwts.claims().setSubject(authentication.getName());
         Date now = new Date();
@@ -46,9 +49,11 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    /**
+    */
+/**
      * Refresh 토큰 생성
-     */
+     *//*
+
     public String createRefreshToken(Authentication authentication){
         Claims claims = Jwts.claims().setSubject(authentication.getName());
         Date now = new Date();
@@ -72,9 +77,11 @@ public class JwtTokenProvider {
         return refreshToken;
     }
 
-    /**
+    */
+/**
      * 토큰으로부터 클레임을 만들고, 이를 통해 User 객체 생성해 Authentication 객체 반환
-     */
+     *//*
+
     public Authentication getAuthentication(String token) {
         String userPrincipal = Jwts.parser().
                 setSigningKey(secretKey)
@@ -85,9 +92,11 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
-    /**
+    */
+/**
      * http 헤더로부터 bearer 토큰을 가져옴.
-     */
+     *//*
+
     public String resolveToken(HttpServletRequest req) {
         String bearerToken = req.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
@@ -96,9 +105,11 @@ public class JwtTokenProvider {
         return null;
     }
 
-    /**
+    */
+/**
      * Access 토큰을 검증
-     */
+     *//*
+
     public boolean validateToken(String token){
         try{
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
@@ -111,4 +122,4 @@ public class JwtTokenProvider {
             throw new BaseException(INVALID_JWT);
         }
     }
-}
+}*/
