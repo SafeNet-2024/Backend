@@ -80,8 +80,8 @@ public class MessageRoomService {
                     .roomId(messageRoomDto.getRoomId())
                     .sender(messageRoomDto.getSender())
                     .receiver(messageRoomDto.getReceiver())
-                    .member(member)
-                    .post(post)
+                    .member_msgroom(member)
+                    .post_msgroom(post)
                     .build();
             messageRoom = messageRoomRepository.save(newRoom);
 
@@ -162,7 +162,7 @@ public class MessageRoomService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 쪽지방이 존재하지 않습니다."));
 
         // 게시글 검증 없이 메시지룸의 post 참조
-        Post post = messageRoom.getPost();
+        Post post = messageRoom.getPost_msgroom();
         if (post == null) {
             throw new IllegalArgumentException("쪽지방에 연결된 게시물이 존재하지 않습니다.");
         }
@@ -180,7 +180,6 @@ public class MessageRoomService {
                 .receiver(messageRoom.getReceiver())
                 .postId(post.getId()).build();
     }
-
 
 
     /**
@@ -221,8 +220,8 @@ public class MessageRoomService {
                     .roomId(messageRoom.getRoomId())
                     .sender(updatedSender)
                     .receiver(updatedReceiver)
-                    .member(messageRoom.getMember())
-                    .post(messageRoom.getPost())
+                    .member_msgroom(messageRoom.getMember_msgroom())
+                    .post_msgroom(messageRoom.getPost_msgroom())
                     .createdAt(messageRoom.getCreatedAt())
                     .build();
 

@@ -28,7 +28,7 @@ public class MessageService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 쪽지방이 존재하지 않습니다."));
         Message message = Message.builder()
                 .sender(messageDto.getSender())
-                .messageRoom(messageRoom)
+                .msgroom_msg(messageRoom)
                 .message(messageDto.getMessage())
                 .build();
         messageRepository.save(message);
