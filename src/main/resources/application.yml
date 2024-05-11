@@ -11,6 +11,10 @@ spring:
       port: 6379
   profiles:
     include: aws
+  devtools:
+    restart:
+      enabled: false
 logging:
   level:
     org.hibernate.SQL: debug # logger를 통한 하이버네이트 실행 SQL 남기기
+

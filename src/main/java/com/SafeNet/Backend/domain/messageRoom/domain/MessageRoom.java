@@ -25,27 +25,30 @@ public class MessageRoom {
     @Column(name = "message_room_id")
     private Long id;
 
-    @Column(name = "room_id", unique = true)
+    @Column(name = "room_id", unique = true, nullable = false)
     private String roomId;
 
+    @Column(nullable = false)
     private String roomName;
 
+    @Column(nullable = false)
     private String sender; // 채팅방 생성자(송신자)
 
+    @Column(nullable = false)
     private String receiver; // 채팅방 수신자
-
-    @OneToMany(mappedBy = "messageRoom", cascade = CascadeType.REMOVE)
-    private List<Message> messageList = new ArrayList<>();
-
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
-
-    @OneToOne(fetch = LAZY)
-    @JoinColumn(name = "post_id")
-    private Post post;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt; // 현재 시간 자동 할당
+
+    @OneToMany(mappedBy = "msgroom_msg", cascade = CascadeType.REMOVE)
+    private List<Message> messageList = new ArrayList<>();
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member_msgroom;
+
+    @OneToOne(fetch = LAZY)
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post_msgroom;
 }

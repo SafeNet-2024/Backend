@@ -26,10 +26,12 @@ public class Message {
     @Column(name = "message_id")
     private Long id;
 
+    @Column(nullable = false)
     private String sender;
 
     private String receiver;
 
+    @Column(nullable = false)
     private String message;
 
     @CreationTimestamp
@@ -37,6 +39,6 @@ public class Message {
     private LocalDateTime sentTime;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "room_id", referencedColumnName = "room_id")
-    private MessageRoom messageRoom;
+    @JoinColumn(name = "room_id", referencedColumnName = "room_id", nullable = false)
+    private MessageRoom msgroom_msg;
 }
