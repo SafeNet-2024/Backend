@@ -1,8 +1,5 @@
-package com.SafeNet.Backend.domain.files.domain;
+package com.SafeNet.Backend.domain.file.domain;
 
-import com.SafeNet.Backend.domain.member.domain.Member;
-import com.SafeNet.Backend.domain.post.domain.Category;
-import com.SafeNet.Backend.domain.post.domain.Post;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,14 +10,12 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
-import static jakarta.persistence.FetchType.LAZY;
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
 @Getter
-public class Files {
+public class File {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "files_id")

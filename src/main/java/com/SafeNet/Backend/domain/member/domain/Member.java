@@ -1,6 +1,6 @@
 package com.SafeNet.Backend.domain.member.domain;
 
-import com.SafeNet.Backend.domain.files.domain.Files;
+import com.SafeNet.Backend.domain.file.domain.File;
 import com.SafeNet.Backend.domain.likes.domain.Likes;
 import com.SafeNet.Backend.domain.messageRoom.domain.MessageRoom;
 import com.SafeNet.Backend.domain.post.domain.Post;
@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.io.File;
 import java.util.List;
 
 import static jakarta.persistence.FetchType.LAZY;
@@ -55,5 +54,5 @@ public class Member {
 
     @OneToMany(mappedBy = "member_files", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private List<Files> filesList; // 단방향 참조
+    private List<File> fileList; // 단방향 참조
 }

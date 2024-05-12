@@ -4,10 +4,12 @@ import com.SafeNet.Backend.domain.likes.domain.Likes;
 import com.SafeNet.Backend.domain.member.domain.Member;
 import com.SafeNet.Backend.domain.messageRoom.domain.MessageRoom;
 import com.SafeNet.Backend.domain.region.domain.Region;
-import com.SafeNet.Backend.domain.files.domain.Files;
+import com.SafeNet.Backend.domain.file.domain.File;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,10 +32,10 @@ public class Post {
     private String title;
 
     @Column(nullable = false)
-    private Integer cost;
+    private int cost;
 
     @Column(nullable = false)
-    private Integer count;
+    private int count;
 
     @Column(nullable = false)
     private LocalDate buyDate;
@@ -41,10 +43,11 @@ public class Post {
     @Lob
     private String contents;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(nullable = false)
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime created;
 
+    @UpdateTimestamp
     private LocalDateTime updated;
 
     @Builder.Default
@@ -72,5 +75,5 @@ public class Post {
 
     @OneToMany(mappedBy = "post_files", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private List<Files> filesList; // 단방향 참조
+    private List<File> fileList; // 단방향 참조
 }
