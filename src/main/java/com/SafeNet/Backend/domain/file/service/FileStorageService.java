@@ -29,13 +29,14 @@ public class FileStorageService {
         try {
             String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename(); // 파일 이름 생성
             Path targetLocation = this.fileStorageLocation.resolve(fileName); // 타겟 파일 경로 설정
-            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING); // 입력 스트림의 데이터를 타겟 파일 경로로 복사
+            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING); // 입력 스트림의 데이터를 타겟 파일 경로로 복사, 해당 파일이 존재한다면 덮어쓰기
 
             // Files 엔티티 생성 및 저장
             File files = File.builder()
                     .fileType(fileType)
                     .fileUrl(targetLocation.toString())
                     .build();
+
             return fileRepository.save(files);
         } catch (IOException e) {
             throw new FileStorageException("Failed to store file " + file.getOriginalFilename(), e);
