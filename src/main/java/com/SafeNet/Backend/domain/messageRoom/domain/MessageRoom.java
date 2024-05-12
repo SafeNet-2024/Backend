@@ -41,14 +41,14 @@ public class MessageRoom {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt; // 현재 시간 자동 할당
 
-    @OneToMany(mappedBy = "msgroom_msg", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "messageRoom", cascade = CascadeType.REMOVE)
     private List<Message> messageList = new ArrayList<>();
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id", nullable = false)
-    private Member member_msgroom;
+    private Member member;
 
     @OneToOne(fetch = LAZY)
     @JoinColumn(name = "post_id", nullable = false)
-    private Post post_msgroom;
+    private Post post;
 }

@@ -40,5 +40,5 @@ public class Message {
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "room_id", referencedColumnName = "room_id", nullable = false)
-    private MessageRoom msgroom_msg;
+    private MessageRoom messageRoom;
 }

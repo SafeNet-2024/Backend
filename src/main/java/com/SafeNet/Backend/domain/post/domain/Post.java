@@ -60,13 +60,13 @@ public class Post {
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id", nullable = false)
-    private Member member_post;
+    private Member member;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "region_id", nullable = false)
-    private Region region_post;
+    private Region region;
 
-    @OneToOne(fetch = LAZY, mappedBy = "post_msgroom", cascade = CascadeType.ALL)
+    @OneToOne(fetch = LAZY, mappedBy = "post", cascade = CascadeType.ALL)
     private MessageRoom messageRoom;
 
     @OneToMany(mappedBy = "post_likes", cascade = CascadeType.ALL, orphanRemoval = true)
