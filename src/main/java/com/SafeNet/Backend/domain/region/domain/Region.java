@@ -2,6 +2,7 @@ package com.SafeNet.Backend.domain.region.domain;
 
 import com.SafeNet.Backend.domain.member.domain.Member;
 import com.SafeNet.Backend.domain.messageRoom.domain.MessageRoom;
+import com.SafeNet.Backend.domain.post.domain.Post;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -31,11 +32,11 @@ public class Region {
     @Column(length = 30)
     private String district;
 
-    @OneToMany(mappedBy = "region_member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "region", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Member> memberList;
 
-    @OneToMany(mappedBy = "region_post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "region", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private List<Member> postList;
+    private List<Post> postList;
 }

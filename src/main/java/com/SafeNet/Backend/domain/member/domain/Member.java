@@ -38,13 +38,13 @@ public class Member {
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "region_id", nullable = false)
-    private Region region_member;
+    private Region region;
 
-    @OneToMany(mappedBy = "member_msgroom", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<MessageRoom> messageRooms;
 
-    @OneToMany(mappedBy = "member_post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Post> postList;
 
