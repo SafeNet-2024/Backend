@@ -1,6 +1,6 @@
 package com.SafeNet.Backend.domain.post.domain;
 
-import com.SafeNet.Backend.domain.likes.domain.Likes;
+import com.SafeNet.Backend.domain.likes.domain.Like;
 import com.SafeNet.Backend.domain.member.domain.Member;
 import com.SafeNet.Backend.domain.messageRoom.domain.MessageRoom;
 import com.SafeNet.Backend.domain.region.domain.Region;
@@ -69,11 +69,13 @@ public class Post {
     @OneToOne(fetch = LAZY, mappedBy = "post", cascade = CascadeType.ALL)
     private MessageRoom messageRoom;
 
-    @OneToMany(mappedBy = "post_likes", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "post_id")
     @JsonIgnore
-    private List<Likes> likesList;
+    private List<Like> likeList; // 단방향 참조
 
-    @OneToMany(mappedBy = "post_files", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "post_id")
     @JsonIgnore
-    private List<File> fileList; // 단방향 참조
+    private List<File> fileList; // 단방향 참조 (File 클래스에 Post에 대한 참조 안함)
 }

@@ -1,7 +1,5 @@
 package com.SafeNet.Backend.domain.likes.domain;
 
-import com.SafeNet.Backend.domain.member.domain.Member;
-import com.SafeNet.Backend.domain.post.domain.Post;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,14 +10,13 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
-import static jakarta.persistence.FetchType.LAZY;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
 @Getter
-public class Likes {
+public class Like {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "likes_id")
@@ -31,12 +28,4 @@ public class Likes {
 
     @UpdateTimestamp
     private LocalDateTime updated;
-
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member_likes;
-
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
-    private Post post_likes;
 }
