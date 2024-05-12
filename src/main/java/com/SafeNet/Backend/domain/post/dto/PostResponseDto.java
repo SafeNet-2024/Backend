@@ -20,6 +20,5 @@ public class PostResponseDto {
     private String contents;
     private String writer;
     private int price;
-    private MultipartFile productImage;
 }
 

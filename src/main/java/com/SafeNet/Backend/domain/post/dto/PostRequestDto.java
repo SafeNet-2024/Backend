@@ -17,6 +17,4 @@ public class PostRequestDto {
     private Integer count;
     private String buyDate; // LocalDate 대신 String으로 받음
     private String contents;
-    private MultipartFile receiptImage;
-    private MultipartFile productImage;
 }
