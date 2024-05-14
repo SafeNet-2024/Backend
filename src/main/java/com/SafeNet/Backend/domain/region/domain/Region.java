@@ -1,7 +1,6 @@
 package com.SafeNet.Backend.domain.region.domain;
 
 import com.SafeNet.Backend.domain.member.domain.Member;
-import com.SafeNet.Backend.domain.messageRoom.domain.MessageRoom;
 import com.SafeNet.Backend.domain.post.domain.Post;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

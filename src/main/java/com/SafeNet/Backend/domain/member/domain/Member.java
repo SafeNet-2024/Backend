@@ -1,8 +1,8 @@
 package com.SafeNet.Backend.domain.member.domain;
 
 import com.SafeNet.Backend.domain.file.domain.File;
-import com.SafeNet.Backend.domain.likes.domain.Like;
-import com.SafeNet.Backend.domain.messageRoom.domain.MessageRoom;
+import com.SafeNet.Backend.domain.postLike.domain.PostLike;
+import com.SafeNet.Backend.domain.messageroom.domain.MessageRoom;
 import com.SafeNet.Backend.domain.post.domain.Post;
 import com.SafeNet.Backend.domain.region.domain.Region;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -51,7 +51,7 @@ public class Member {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "member_id")
     @JsonIgnore
-    private List<Like> likeList; // 단방향 참조
+    private List<PostLike> postLikeList; // 단방향 참조
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "member_id")

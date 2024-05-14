@@ -51,8 +51,8 @@ public class PostService {
         return posts.stream().map(post -> PostResponseDto.builder()
                 .postId(post.getId())
                 .title(post.getTitle())
-                .likeCount(post.getLikeList().size()) // 좋아요 개수가 0이면 빈 하트, 1이면 채운 하트
-                .imageUrl(post.getFileList().isEmpty() ? null : post.getFileList().get(0).getFileUrl())
+                .likeCount(post.getPostLikeList().size()) // 좋아요 개수가 0이면 빈 하트, 1이면 채운 하트
+                .imageUrl(post.getFileList().isEmpty() ? null : post.getFileList().get(1).getFileUrl()) // 상품 이미지 가져오기
                 .build()).collect(Collectors.toList());
     }
 
@@ -62,7 +62,7 @@ public class PostService {
                 .title(post.getTitle())
                 .writer(post.getMember().getName())
                 .contents(post.getContents())
-                .imageUrl(post.getFileList().isEmpty() ? null : post.getFileList().get(0).getFileUrl())
+                .imageUrl(post.getFileList().isEmpty() ? null : post.getFileList().get(1).getFileUrl())
                 .price(post.getCost())
                 .count(post.getCount())
                 .buyDate(post.getBuyDate().toString())

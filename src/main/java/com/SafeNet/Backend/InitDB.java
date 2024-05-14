@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -31,21 +31,31 @@ public class InitDB {
         private final RegionRepository regionRepository;
 
         public void userDBInit() {
-//            List<Member> memberList = memberRepository.findAll();
-//            if (memberList.isEmpty()) {
-            Region region = Region.builder()
-                    .city("서울시")
-                    .build();
-            Member member = Member.builder()
-                    .name("회원A")
-                    .name("010-1111-2222")
-                    .email("abc@gmail.com")
-                    .pwd("1111")
-                    .region(region)
-                    .build();
-            regionRepository.save(region);
-            memberRepository.save(member);
-//            }
+            String cityName = "서울시";
+            String memberEmail = "abc@gmail.com";
+
+            Optional<Region> existingRegion = regionRepository.findByCity(cityName);
+            Region region;
+            if (existingRegion.isEmpty()) {
+                region = Region.builder()
+                        .city(cityName)
+                        .build();
+                regionRepository.save(region);
+            } else {
+                region = existingRegion.get();
+            }
+
+            Optional<Member> existingMember = memberRepository.findByEmail(memberEmail);
+            if (existingMember.isEmpty()) {
+                Member member = Member.builder()
+                        .name("회원A")
+                        .phoneNumber("010-1111-2222")
+                        .email(memberEmail)
+                        .pwd("1111")
+                        .region(region)
+                        .build();
+                memberRepository.save(member);
+            }
         }
     }
 }

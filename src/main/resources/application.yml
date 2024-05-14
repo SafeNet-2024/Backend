@@ -1,7 +1,7 @@
 spring:
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     properties:
       hibernate:
         format_sql: true
@@ -19,4 +19,4 @@ logging:
     org.hibernate.SQL: debug # logger를 통한 하이버네이트 실행 SQL 남기기
 
 file:
-  upload-dir: C:/safenet/upload/dir
+  upload-dir: C:/safenet

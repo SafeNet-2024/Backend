@@ -1,4 +1,4 @@
-package com.SafeNet.Backend.domain.messageRoom.dto;
+package com.SafeNet.Backend.domain.messageroom.dto;
 
 import com.SafeNet.Backend.domain.member.domain.Member;
 import com.SafeNet.Backend.domain.message.dto.MessageRequestDto;

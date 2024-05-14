@@ -2,7 +2,7 @@ package com.SafeNet.Backend.domain.message.api;
 
 import com.SafeNet.Backend.domain.message.dto.MessageDto;
 import com.SafeNet.Backend.domain.message.service.MessageService;
-import com.SafeNet.Backend.domain.messageRoom.service.MessageRoomService;
+import com.SafeNet.Backend.domain.messageroom.service.MessageRoomService;
 import com.SafeNet.Backend.global.pubsub.RedisPublisher;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

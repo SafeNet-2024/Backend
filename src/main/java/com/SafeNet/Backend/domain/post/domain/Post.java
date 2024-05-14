@@ -1,8 +1,8 @@
 package com.SafeNet.Backend.domain.post.domain;
 
-import com.SafeNet.Backend.domain.likes.domain.Like;
+import com.SafeNet.Backend.domain.postLike.domain.PostLike;
 import com.SafeNet.Backend.domain.member.domain.Member;
-import com.SafeNet.Backend.domain.messageRoom.domain.MessageRoom;
+import com.SafeNet.Backend.domain.messageroom.domain.MessageRoom;
 import com.SafeNet.Backend.domain.region.domain.Region;
 import com.SafeNet.Backend.domain.file.domain.File;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -48,6 +48,7 @@ public class Post {
     private LocalDateTime created;
 
     @UpdateTimestamp
+    @Column(nullable = false)
     private LocalDateTime updated;
 
     @Builder.Default
@@ -72,7 +73,7 @@ public class Post {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "post_id")
     @JsonIgnore
-    private List<Like> likeList; // 단방향 참조
+    private List<PostLike> postLikeList; // 단방향 참조
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "post_id")

@@ -1,4 +1,4 @@
-package com.SafeNet.Backend.domain.likes.domain;
+package com.SafeNet.Backend.domain.postLike.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Getter
-public class Like {
+public class PostLike {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "likes_id")
@@ -27,5 +27,6 @@ public class Like {
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
+    @Column(nullable = false)
     private LocalDateTime updated;
 }
