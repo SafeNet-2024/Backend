@@ -1,4 +1,4 @@
-package com.SafeNet.Backend.domain.messageRoom.domain;
+package com.SafeNet.Backend.domain.messageroom.domain;
 
 import com.SafeNet.Backend.domain.post.domain.Post;
 import com.SafeNet.Backend.domain.member.domain.Member;
@@ -18,7 +18,6 @@ import static jakarta.persistence.FetchType.LAZY;
 @Builder
 @Entity
 @Getter
-@Table(name = "message_room")
 public class MessageRoom {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

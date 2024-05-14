@@ -34,5 +34,6 @@ public class File {
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
+    @Column(nullable = false)
     private LocalDateTime updated;
 }

@@ -1,8 +1,8 @@
-package com.SafeNet.Backend.domain.messageRoom.repository;
+package com.SafeNet.Backend.domain.messageroom.repository;
 
 
 import com.SafeNet.Backend.domain.member.domain.Member;
-import com.SafeNet.Backend.domain.messageRoom.domain.MessageRoom;
+import com.SafeNet.Backend.domain.messageroom.domain.MessageRoom;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

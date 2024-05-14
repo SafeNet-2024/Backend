@@ -7,9 +7,9 @@ import com.SafeNet.Backend.domain.message.dto.MessageDto;
 import com.SafeNet.Backend.domain.message.dto.MessageRequestDto;
 import com.SafeNet.Backend.domain.message.dto.MessageResponseDto;
 import com.SafeNet.Backend.domain.message.repository.MessageRepository;
-import com.SafeNet.Backend.domain.messageRoom.domain.MessageRoom;
-import com.SafeNet.Backend.domain.messageRoom.repository.MessageRoomRepository;
-import com.SafeNet.Backend.domain.messageRoom.service.MessageRoomService;
+import com.SafeNet.Backend.domain.messageroom.domain.MessageRoom;
+import com.SafeNet.Backend.domain.messageroom.repository.MessageRoomRepository;
+import com.SafeNet.Backend.domain.messageroom.service.MessageRoomService;
 import com.SafeNet.Backend.domain.post.domain.Post;
 import com.SafeNet.Backend.domain.post.repository.PostRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -21,7 +21,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 

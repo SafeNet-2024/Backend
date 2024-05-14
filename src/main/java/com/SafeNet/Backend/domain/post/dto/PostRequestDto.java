@@ -2,13 +2,17 @@ package com.SafeNet.Backend.domain.post.dto;
 
 import com.SafeNet.Backend.domain.post.domain.Category;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 
 @Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PostRequestDto {
     private Category category;
