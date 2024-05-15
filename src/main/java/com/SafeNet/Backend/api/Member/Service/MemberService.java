@@ -5,7 +5,6 @@ import com.SafeNet.Backend.api.Member.Dto.SignupRequestDto;
 import com.SafeNet.Backend.api.Member.Dto.TokenResponseDto;
 import com.SafeNet.Backend.api.Member.Entity.Member;
 import com.SafeNet.Backend.api.Member.Repository.MemberRepository;
-import com.SafeNet.Backend.api.Member.Repository.RefreshTokenRepository;
 import com.SafeNet.Backend.global.auth.JwtTokenProvider;
 import com.SafeNet.Backend.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -33,27 +32,29 @@ public class MemberService {
      ** 회원가입
      */
     @Transactional
-    public Member signUpUser(SignupRequestDto signupRequestDto) {
+    public void signUpUser(SignupRequestDto signupRequestDto) {
         Optional<Member> valiMember = memberRepository.findByEmail(signupRequestDto.getEmail());
-        // 중복가입 방지
-        if(valiMember.isPresent()){
-            throw new CustomException("This email is already Exist "+ signupRequestDto.getEmail());
-        }
-        // 닉네임 중복검사
-        else if (memberRepository.existsMemberByName(signupRequestDto.getName())) {
-            throw new CustomException("This nickName is already Exist "+ signupRequestDto.getName());
-        }
-        Member member = Member.builder()
-                .email(signupRequestDto.getEmail())
-                .name(signupRequestDto.getName())
-                .phoneNumber(signupRequestDto.getPhoneNumber())
-                .pwd(passwordEncoder.encode(signupRequestDto.getPassword())) //비밀번호 암호화
-                //.regionId()
-                .build();
+        try {
+            // 중복가입 방지
+            if (valiMember.isPresent()) {
+                throw new CustomException("This email is already Exist ");
+            }
+            // 닉네임 중복검사
+            else if (memberRepository.existsMemberByName(signupRequestDto.getName())) {
+                throw new CustomException("This nickName is already Exist ");
+            }
+            Member member = Member.builder()
+                    .email(signupRequestDto.getEmail())
+                    .name(signupRequestDto.getName())
+                    .phoneNumber(signupRequestDto.getPhoneNumber())
+                    .pwd(passwordEncoder.encode(signupRequestDto.getPassword())) //비밀번호 암호화
+                    //.regionId()
+                    .build();
 
-        memberRepository.save(member);
-
-        return member;
+            memberRepository.save(member);
+        }catch (Exception e){
+            throw new CustomException("에러가 발생: "+ e.getMessage());
+        }
     }
     /*
      ** 로그인
