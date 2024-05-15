@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
@@ -13,13 +15,13 @@ import java.util.Collection;
 @NoArgsConstructor
 @Entity
 @Table(name = "member")
-public class Member extends BaseTimeEntity {
+public class Member extends BaseTimeEntity implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
     private Long id;
-
+    //코드상에 나오는 Username들은 모두 email을 뜻함
     @Column(name = "email", unique = true, nullable = false)
     private String email;
 
@@ -34,29 +36,25 @@ public class Member extends BaseTimeEntity {
     @NotNull
     private String pwd;
 
-    @Column(name = "region_id")
-    @NotNull
-    private int regionId;
+    //@Column(name = "region_id")
+    //@NotNull
+    //private int regionId;
 
     @Builder
-    public Member(Long memberId, String email, String name, String phoneNumber, String pwd , int regionId) {
-        this.id=memberId;
+    public Member( String email, String name, String phoneNumber, String pwd ) {
         this.email=email;
         this.name= name;
         this.phoneNumber= phoneNumber;
         this.pwd= pwd;
-        this.regionId =regionId;
+        //this.regionId =regionId;
 
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Long getId() {
         return id;
     }
-/*
+
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
@@ -69,7 +67,7 @@ public class Member extends BaseTimeEntity {
 
     @Override
     public String getUsername() {
-        return this.name;
+        return this.email;
     }
     // 계정 만료되었는지 (true - 만료 안됨)
     @Override
@@ -90,6 +88,6 @@ public class Member extends BaseTimeEntity {
     @Override
     public boolean isEnabled() {
         return true;
-    }*/
+    }
 
 }
