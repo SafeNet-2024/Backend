@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,26 +31,20 @@ public class MemberController {
 
     @Operation(summary = "회원가입", description = "회원가입을 승인합니다.")
     @PostMapping("/signup")
-    public ResponseEntity<Response> signUpUser(@RequestBody SignupRequestDto signupRequestDto){
-        Response response = new Response();
+    public ResponseEntity<?> signUpUser(@RequestBody SignupRequestDto signupRequestDto){
+        String message = "";
         HttpStatus status = HttpStatus.OK;
 
         try{
             memberService.signUpUser(signupRequestDto);
-            response.setMessage("회원가입을 성공적으로 완료했습니다.");
-            log.info("회원가입을 성공적으로 완료했습니다.");
+            message ="회원가입을 성공적으로 완료했습니다.";
         }
-        catch(CustomException e){
-            response.setMessage("회원가입을 하는 도중 오류가 발생했습니다."+ e.toString());
+        catch(Exception e){
+            message = "회원가입을 하는 도중 오류가 발생했습니다."+ e.getMessage();
             status = HttpStatus.BAD_REQUEST; // 요청 오류로 인식
-            log.info("회원가입을 하는 도중 오류가 발생했습니다."+ e.toString());
-        }
-        catch (Exception e) { // 기타 예외 발생 시
-            response.setMessage("서버 내부 오류가 발생했습니다.");
-            status = HttpStatus.INTERNAL_SERVER_ERROR; // 서버 내부 오류로 인식
         }
 
-        return ResponseEntity.status(status).body(response);
+        return ResponseEntity.status(status).body(message);
     }
 
 
@@ -68,14 +61,17 @@ public class MemberController {
     @Operation(summary = "로그인", description = "로그인을 승인합니다.")
     @PostMapping("/login")
     public ResponseEntity<TokenResponseDto> login(@RequestBody LoginRequestDto loginRequestDto){
+        TokenResponseDto token= null;
         try{
-            TokenResponseDto token = memberService.login(loginRequestDto);
-            String message = "회원가입을 성공적으로 완료했습니다.";
-            return ResponseEntity.ok().body(token);
+            token = memberService.login(loginRequestDto);
+            String message = "로그인을 성공적으로 완료했습니다.";
+
         }
         catch(Exception e){
-            throw new CustomException("회원가입을 하는 도중 오류가 발생했습니다."+ e.toString());
+            throw new CustomException("로그인 하는 도중 오류가 발생했습니다."+ e.toString());
         }
+
+        return ResponseEntity.ok().body(token);
 
     }
 

@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -49,11 +50,22 @@ public class JwtFilter extends OncePerRequestFilter {
             }
         } catch (RedisConnectionFailureException e) {
             SecurityContextHolder.clearContext();
-            throw new CustomException("REDIS_ERROR");
+            writeErrorResponse(response, HttpStatus.INTERNAL_SERVER_ERROR, "REDIS_ERROR", e);
         } catch (Exception e) {
-            throw new CustomException("INVALID_JWT");
+            writeErrorResponse(response, HttpStatus.BAD_REQUEST, "INVALID_JWT", e);
         }
 
-        filterChain.doFilter(request, response);
+        try {
+            filterChain.doFilter(request, response);
+        } catch (Exception e) {
+            writeErrorResponse(response, HttpStatus.BAD_REQUEST, "Error during filtering request", e);
+        }
+    }
+
+    private void writeErrorResponse(HttpServletResponse response, HttpStatus status, String error, Exception e) throws IOException {
+        response.setStatus(status.value());
+        response.setContentType("application/json");
+        response.getWriter().write("{\"error\": \"" + error + "\", \"message\": \"" + e.getMessage() + "\"}");
+        response.getWriter().flush();
     }
 }
