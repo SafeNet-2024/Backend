@@ -34,27 +34,23 @@ public class MemberService {
     @Transactional
     public void signUpUser(SignupRequestDto signupRequestDto) {
         Optional<Member> valiMember = memberRepository.findByEmail(signupRequestDto.getEmail());
-        try {
-            // 중복가입 방지
-            if (valiMember.isPresent()) {
-                throw new CustomException("This email is already Exist ");
-            }
-            // 닉네임 중복검사
-            else if (memberRepository.existsMemberByName(signupRequestDto.getName())) {
-                throw new CustomException("This nickName is already Exist ");
-            }
-            Member member = Member.builder()
-                    .email(signupRequestDto.getEmail())
-                    .name(signupRequestDto.getName())
-                    .phoneNumber(signupRequestDto.getPhoneNumber())
-                    .pwd(passwordEncoder.encode(signupRequestDto.getPassword())) //비밀번호 암호화
-                    //.regionId()
-                    .build();
-
-            memberRepository.save(member);
-        }catch (Exception e){
-            throw new CustomException("에러가 발생: "+ e.getMessage());
+        // 중복가입 방지
+        if (valiMember.isPresent()) {
+            throw new CustomException("This email is already Exist ");
         }
+        // 닉네임 중복검사
+        else if (memberRepository.existsMemberByName(signupRequestDto.getName())) {
+            throw new CustomException("This nickName is already Exist ");
+        }
+        Member member = Member.builder()
+                .email(signupRequestDto.getEmail())
+                .name(signupRequestDto.getName())
+                .phoneNumber(signupRequestDto.getPhoneNumber())
+                .pwd(passwordEncoder.encode(signupRequestDto.getPassword())) //비밀번호 암호화
+                //.regionId()
+                .build();
+
+        memberRepository.save(member);
     }
     /*
      ** 로그인
@@ -72,22 +68,29 @@ public class MemberService {
             if (!passwordEncoder.matches(loginRequestDto.getPassword(), member.getPassword())) {
                 throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
             }
-            UsernamePasswordAuthenticationToken authenticationToken =
-                    new UsernamePasswordAuthenticationToken(member.getEmail(), member.getPassword());
-            Authentication authentication = authenticationManager.authenticate(authenticationToken);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            String accessToken = jwtTokenProvider.createAccessToken(authentication);
-            String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
+            try {
+                UsernamePasswordAuthenticationToken authenticationToken =
+                        new UsernamePasswordAuthenticationToken(loginRequestDto.getEmail(), loginRequestDto.getPassword()); //암호화된 member객체 pwd대신 dto의 패스워드를 넣어 사용
+                Authentication authentication = authenticationManager.authenticate(authenticationToken);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                String accessToken = jwtTokenProvider.createAccessToken(authentication);
+                String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
+
+                log.info("[로그인 알림] {} 회원님이 로그인했습니다.", member.getId());
 
 
-            log.info("[로그인 알림] {} 회원님이 로그인했습니다.", member.getId());
-
-
-            return TokenResponseDto.builder()
-                    .grantType("Bearer")
-                    .accessToken(accessToken)
-                    .refreshToken(refreshToken)
-                    .build();
+                return TokenResponseDto.builder()
+                        .grantType("Bearer")
+                        .accessToken(accessToken)
+                        .refreshToken(refreshToken)
+                        .build();
+            }catch (BadCredentialsException e){
+                log.info("로그인 시도 - 인증 실패: {}", e.getMessage());
+                throw new CustomException("자격 증명에 실패하였습니다. " + e.getMessage());
+            }catch (Exception e) {
+                log.error("로그인 시도 중 예외 발생: {}", e.getMessage(), e);
+                throw new CustomException("로그인 중 알 수 없는 오류가 발생했습니다. " + e.getMessage());
+            }
         }
     }
 }

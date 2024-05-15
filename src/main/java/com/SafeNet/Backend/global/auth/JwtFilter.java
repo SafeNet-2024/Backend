@@ -38,6 +38,7 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             // 2. validateToken 으로 토큰 유효성 검사
             if (token != null && jwtTokenProvider.validateToken(token)) {
+                log.info("dofilterInternal : [토큰유효성 검사 통과.]");
                 Authentication auth = jwtTokenProvider.getAuthentication(token);
                 SecurityContextHolder.getContext().setAuthentication(auth); // 정상 토큰이면 SecurityContext에 저장
                 //Redis 에 해당 accessToken logout 여부 확인 : Logout이면 Redis에 특정값이 저장되어있음

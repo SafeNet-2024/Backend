@@ -22,6 +22,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             Member member = memberRepository.findByEmail(email).orElseThrow();
             UserDetailsImpl userDetails = new UserDetailsImpl();
             userDetails.setMember(member);
+            log.info("loadUserByUsername 통과: "+ email);
 
             return userDetails;
         } catch (Exception e) {

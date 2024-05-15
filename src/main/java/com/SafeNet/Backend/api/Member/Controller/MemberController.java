@@ -68,7 +68,8 @@ public class MemberController {
 
         }
         catch(Exception e){
-            throw new CustomException("로그인 하는 도중 오류가 발생했습니다."+ e.toString());
+            log.info(e.getMessage());
+            throw new CustomException("로그인 하는 도중 오류가 발생했습니다. "+ e.getMessage());
         }
 
         return ResponseEntity.ok().body(token);
