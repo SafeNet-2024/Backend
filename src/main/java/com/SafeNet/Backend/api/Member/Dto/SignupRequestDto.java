@@ -26,7 +26,7 @@ public class SignupRequestDto {
 
     @NotEmpty(message = "[필수] 닉네임을 입력해주세요")
     @Size(min=2, message = "닉네임은 최소 두 글자 이상입니다")
-    private String nickname;
+    private String name;
 
     private String phoneNumber;
 
@@ -36,7 +36,7 @@ public class SignupRequestDto {
     public Member toEntity(){
         return Member.builder()
                 .email(email)
-                .name(nickname)
+                .name(name)
                 .pwd(password)
                 .phoneNumber(phoneNumber)
                 //.regionId(regionId)

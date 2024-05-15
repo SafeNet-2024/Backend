@@ -1,4 +1,3 @@
-/*
 package com.SafeNet.Backend.global.util;
 
 import lombok.RequiredArgsConstructor;
@@ -31,4 +30,4 @@ public class RedisUtil {
     public void deleteData(String key) {
         template.delete(key);
     }
-}*/
+}
