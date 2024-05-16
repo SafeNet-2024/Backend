@@ -56,5 +56,5 @@ public class Member {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "member_id")
     @JsonIgnore
-    private List<File> fileList; // 단방향 참조 (File 클래스에 Member에 대한 참조 안함)
+    private List<File> fileList; // 단방향 참조 (File 클래스에서 Member에 대한 참조 안함)
 }

@@ -1,5 +1,6 @@
 package com.SafeNet.Backend.domain.postLike.domain;
 
+import com.SafeNet.Backend.domain.post.domain.Post;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +10,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+
+import static jakarta.persistence.FetchType.LAZY;
 
 
 @NoArgsConstructor
@@ -29,4 +32,8 @@ public class PostLike {
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updated;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
 }

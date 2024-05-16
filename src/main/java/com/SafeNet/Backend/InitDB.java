@@ -31,8 +31,8 @@ public class InitDB {
         private final RegionRepository regionRepository;
 
         public void userDBInit() {
-            String cityName = "서울시";
-            String memberEmail = "abc@gmail.com";
+            String cityName = "용인시";
+            String memberEmail = "song@gmail.com";
 
             Optional<Region> existingRegion = regionRepository.findByCity(cityName);
             Region region;
@@ -48,10 +48,10 @@ public class InitDB {
             Optional<Member> existingMember = memberRepository.findByEmail(memberEmail);
             if (existingMember.isEmpty()) {
                 Member member = Member.builder()
-                        .name("회원A")
-                        .phoneNumber("010-1111-2222")
+                        .name("눈송이")
+                        .phoneNumber("010-3333-4444")
                         .email(memberEmail)
-                        .pwd("1111")
+                        .pwd("3333")
                         .region(region)
                         .build();
                 memberRepository.save(member);

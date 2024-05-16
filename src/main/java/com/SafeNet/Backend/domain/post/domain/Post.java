@@ -1,5 +1,6 @@
 package com.SafeNet.Backend.domain.post.domain;
 
+import com.SafeNet.Backend.domain.post.dto.PostRequestDto;
 import com.SafeNet.Backend.domain.postLike.domain.PostLike;
 import com.SafeNet.Backend.domain.member.domain.Member;
 import com.SafeNet.Backend.domain.messageroom.domain.MessageRoom;
@@ -19,7 +20,7 @@ import static jakarta.persistence.FetchType.LAZY;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 @Entity
 @Getter
 public class Post {
@@ -51,9 +52,10 @@ public class Post {
     @Column(nullable = false)
     private LocalDateTime updated;
 
+    @Enumerated(EnumType.STRING)
     @Builder.Default
     @Column(nullable = false)
-    private Boolean status = false;
+    private PostStatus status = PostStatus.AVAILABLE; // 기본값: 거래가능
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -70,13 +72,25 @@ public class Post {
     @OneToOne(fetch = LAZY, mappedBy = "post", cascade = CascadeType.ALL)
     private MessageRoom messageRoom;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "post_id")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private List<PostLike> postLikeList; // 단방향 참조
+    private List<PostLike> postLikeList;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "post_id")
     @JsonIgnore
-    private List<File> fileList; // 단방향 참조 (File 클래스에 Post에 대한 참조 안함)
+    private List<File> fileList; // 단방향
+
+    // 업데이트 메서드
+    public Post updatePost(PostRequestDto dto, LocalDate parsedBuyDate, List<File> fileList) {
+        return this.toBuilder()
+                .title(dto.getTitle())
+                .category(dto.getCategory())
+                .cost(dto.getCost())
+                .count(dto.getCount())
+                .buyDate(parsedBuyDate)
+                .contents(dto.getContents())
+                .fileList(fileList)
+                .build();
+    }
 }

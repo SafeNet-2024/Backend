@@ -4,7 +4,6 @@ import com.SafeNet.Backend.domain.file.domain.File;
 import com.SafeNet.Backend.domain.file.domain.FileType;
 import com.SafeNet.Backend.domain.file.exception.FileStorageException;
 import com.SafeNet.Backend.domain.file.repository.FileRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +43,8 @@ public class FileStorageService {
             // 파일 이름 생성
             String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
             Path targetLocation = this.fileStorageLocation.resolve(fileName);
+
+            // 로컬에 저장
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
             // File 엔티티 생성 및 저장
@@ -55,6 +56,20 @@ public class FileStorageService {
             return fileRepository.save(files);
         } catch (IOException e) {
             throw new FileStorageException("Failed to store file " + file.getOriginalFilename(), e);
+        }
+    }
+
+    @Transactional
+    public void deleteFile(File file) {
+        try {
+            Path path = Paths.get(file.getFileUrl());
+            // 로컬에서 파일 삭제
+            Files.deleteIfExists(path);
+
+            // 파일 엔티티 삭제
+            fileRepository.delete(file);
+        } catch (IOException e) {
+            throw new FileStorageException("Failed to delete file" + file.getFileUrl(), e);
         }
     }
 }
