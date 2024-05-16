@@ -8,6 +8,10 @@ import com.SafeNet.Backend.domain.region.domain.Region;
 import com.SafeNet.Backend.domain.file.domain.File;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -30,18 +34,25 @@ public class Post {
     private Long id;
 
     @Column(nullable = false, length = 100)
+    @NotBlank(message = "Title must not be empty")
+    @Size(max = 100, message = "Title must be less than 100 characters")
     private String title;
 
     @Column(nullable = false)
+    @Positive(message = "Cost must be a positive number")
     private int cost;
 
     @Column(nullable = false)
+    @Positive(message = "Count must be a positive number")
     private int count;
 
     @Column(nullable = false)
+    @NotNull(message = "Buy Date must not be null")
     private LocalDate buyDate;
 
     @Lob
+    @Column(nullable = false)
+    @NotBlank(message = "Contents must not be empty")
     private String contents;
 
     @CreationTimestamp
@@ -59,6 +70,7 @@ public class Post {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @NotNull(message = "Category must not be null")
     private Category category;
 
     @ManyToOne(fetch = LAZY)
@@ -78,6 +90,7 @@ public class Post {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "post_id")
+    @Size(min = 2, max = 2, message = "File list must contain exactly 2 files")
     @JsonIgnore
     private List<File> fileList; // 단방향
 
