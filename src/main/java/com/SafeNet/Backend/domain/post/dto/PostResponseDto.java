@@ -4,7 +4,6 @@ import com.SafeNet.Backend.domain.post.domain.Category;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Builder
