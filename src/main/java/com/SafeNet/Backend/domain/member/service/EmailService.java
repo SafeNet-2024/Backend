@@ -1,4 +1,4 @@
-package com.SafeNet.Backend.api.Member.Service;
+package com.SafeNet.Backend.domain.member.service;
 
 
 import jakarta.mail.MessagingException;

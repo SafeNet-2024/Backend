@@ -1,8 +1,8 @@
-package com.SafeNet.Backend.api.Member.Service;
+package com.SafeNet.Backend.domain.member.service;
 
-import com.SafeNet.Backend.api.Member.Entity.Member;
-import com.SafeNet.Backend.api.Member.Entity.UserDetailsImpl;
-import com.SafeNet.Backend.api.Member.Repository.MemberRepository;
+import com.SafeNet.Backend.domain.member.entity.Member;
+import com.SafeNet.Backend.domain.member.entity.UserDetailsImpl;
+import com.SafeNet.Backend.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,6 +1,6 @@
-package com.SafeNet.Backend.api.Member.Repository;
+package com.SafeNet.Backend.domain.member.repository;
 
-import com.SafeNet.Backend.api.Member.Entity.RefreshToken;
+import com.SafeNet.Backend.domain.member.entity.RefreshToken;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Repository;

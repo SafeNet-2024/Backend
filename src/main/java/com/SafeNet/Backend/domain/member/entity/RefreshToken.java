@@ -1,9 +1,8 @@
-package com.SafeNet.Backend.api.Member.Entity;
+package com.SafeNet.Backend.domain.member.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.redis.core.RedisHash;
 
 @Getter
 @AllArgsConstructor

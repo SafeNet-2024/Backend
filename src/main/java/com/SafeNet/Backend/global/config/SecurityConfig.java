@@ -1,15 +1,10 @@
 package com.SafeNet.Backend.global.config;
 
-import com.SafeNet.Backend.api.Member.Entity.UserDetailsImpl;
-import com.SafeNet.Backend.api.Member.Service.EmailService;
 import com.SafeNet.Backend.global.auth.JwtFilter;
 import com.SafeNet.Backend.global.auth.JwtTokenProvider;
 import com.SafeNet.Backend.global.exception.JwtAccessDeniedHandler;
 import com.SafeNet.Backend.global.exception.JwtAuthenticationEntryPoint;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;

@@ -1,6 +1,6 @@
-package com.SafeNet.Backend.api.Member.Dto;
+package com.SafeNet.Backend.domain.member.dto;
 
-import com.SafeNet.Backend.api.Member.Entity.Member;
+import com.SafeNet.Backend.domain.member.entity.Member;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
@@ -8,7 +8,6 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import org.apache.catalina.User;
 
 @Data // getter/setter, requiredArgsController, ToString 등 합쳐놓은 세트
 @Builder
