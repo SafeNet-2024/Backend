@@ -1,7 +1,7 @@
-package com.SafeNet.Backend.domain.postLike.domain;
+package com.SafeNet.Backend.domain.postLike.entity;
 
-import com.SafeNet.Backend.domain.member.domain.Member;
-import com.SafeNet.Backend.domain.post.domain.Post;
+import com.SafeNet.Backend.domain.member.entity.Member;
+import com.SafeNet.Backend.domain.post.entity.Post;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

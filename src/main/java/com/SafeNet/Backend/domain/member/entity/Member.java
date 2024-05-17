@@ -1,10 +1,10 @@
-package com.SafeNet.Backend.domain.member.domain;
+package com.SafeNet.Backend.domain.member.entity;
 
-import com.SafeNet.Backend.domain.file.domain.File;
-import com.SafeNet.Backend.domain.postLike.domain.PostLike;
-import com.SafeNet.Backend.domain.messageroom.domain.MessageRoom;
-import com.SafeNet.Backend.domain.post.domain.Post;
-import com.SafeNet.Backend.domain.region.domain.Region;
+import com.SafeNet.Backend.domain.file.entity.File;
+import com.SafeNet.Backend.domain.postLike.entity.PostLike;
+import com.SafeNet.Backend.domain.messageroom.entity.MessageRoom;
+import com.SafeNet.Backend.domain.post.entity.Post;
+import com.SafeNet.Backend.domain.region.entity.Region;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;

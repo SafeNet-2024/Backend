@@ -1,8 +1,8 @@
-package com.SafeNet.Backend.domain.messageroom.domain;
+package com.SafeNet.Backend.domain.messageroom.entity;
 
-import com.SafeNet.Backend.domain.post.domain.Post;
-import com.SafeNet.Backend.domain.member.domain.Member;
-import com.SafeNet.Backend.domain.message.domain.Message;
+import com.SafeNet.Backend.domain.post.entity.Post;
+import com.SafeNet.Backend.domain.member.entity.Member;
+import com.SafeNet.Backend.domain.message.entity.Message;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

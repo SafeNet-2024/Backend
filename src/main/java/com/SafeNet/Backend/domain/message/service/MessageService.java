@@ -1,9 +1,9 @@
 package com.SafeNet.Backend.domain.message.service;
 
-import com.SafeNet.Backend.domain.message.domain.Message;
+import com.SafeNet.Backend.domain.message.entity.Message;
 import com.SafeNet.Backend.domain.message.dto.MessageDto;
 import com.SafeNet.Backend.domain.message.repository.MessageRepository;
-import com.SafeNet.Backend.domain.messageroom.domain.MessageRoom;
+import com.SafeNet.Backend.domain.messageroom.entity.MessageRoom;
 import com.SafeNet.Backend.domain.messageroom.repository.MessageRoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

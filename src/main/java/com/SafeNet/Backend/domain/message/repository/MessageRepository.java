@@ -1,6 +1,6 @@
 package com.SafeNet.Backend.domain.message.repository;
 
-import com.SafeNet.Backend.domain.message.domain.Message;
+import com.SafeNet.Backend.domain.message.entity.Message;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

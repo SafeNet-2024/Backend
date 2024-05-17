@@ -1,6 +1,6 @@
 package com.SafeNet.Backend.domain.messageroom.api;
 
-import com.SafeNet.Backend.domain.member.domain.Member;
+import com.SafeNet.Backend.domain.member.entity.Member;
 import com.SafeNet.Backend.domain.message.dto.MessageRequestDto;
 import com.SafeNet.Backend.domain.message.dto.MessageResponseDto;
 import com.SafeNet.Backend.domain.messageroom.dto.MessageRoomDto;
