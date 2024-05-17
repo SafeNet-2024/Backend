@@ -1,5 +1,16 @@
 spring:
-  application:
-    name: Backend
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
   profiles:
     include: aws
+logging:
+  level:
+    org.hibernate.SQL: debug # logger를 통한 하이버네이트 실행 SQL 남기기
