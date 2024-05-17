@@ -1,10 +1,10 @@
-package com.SafeNet.Backend.api.Member.Service;
+package com.SafeNet.Backend.domain.member.service;
 
-import com.SafeNet.Backend.api.Member.Dto.LoginRequestDto;
-import com.SafeNet.Backend.api.Member.Dto.SignupRequestDto;
-import com.SafeNet.Backend.api.Member.Dto.TokenResponseDto;
-import com.SafeNet.Backend.api.Member.Entity.Member;
-import com.SafeNet.Backend.api.Member.Repository.MemberRepository;
+import com.SafeNet.Backend.domain.member.dto.LoginRequestDto;
+import com.SafeNet.Backend.domain.member.dto.SignupRequestDto;
+import com.SafeNet.Backend.domain.member.dto.TokenResponseDto;
+import com.SafeNet.Backend.domain.member.entity.Member;
+import com.SafeNet.Backend.domain.member.repository.MemberRepository;
 import com.SafeNet.Backend.global.auth.JwtTokenProvider;
 import com.SafeNet.Backend.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,7 @@
 package com.SafeNet.Backend.global.auth;
 
-import com.SafeNet.Backend.api.Member.Dto.TokenResponseDto;
-import com.SafeNet.Backend.api.Member.Service.UserDetailsServiceImpl;
+import com.SafeNet.Backend.domain.member.dto.TokenResponseDto;
+import com.SafeNet.Backend.domain.member.service.UserDetailsServiceImpl;
 import com.SafeNet.Backend.global.exception.CustomException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;

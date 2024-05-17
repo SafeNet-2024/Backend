@@ -1,17 +1,15 @@
-package com.SafeNet.Backend.api.Region.Entity;
+package com.SafeNet.Backend.domain.member.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
 
 @Getter
 @NoArgsConstructor
 @Entity
 @Table(name = "region")
 public class Region {
-    @jakarta.persistence.Id
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "region_id")

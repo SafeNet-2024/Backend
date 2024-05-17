@@ -1,4 +1,4 @@
-package com.SafeNet.Backend.api.Member.Entity;
+package com.SafeNet.Backend.domain.member.entity;
 
 import com.SafeNet.Backend.global.util.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -36,9 +36,9 @@ public class Member extends BaseTimeEntity implements UserDetails {
     @NotNull
     private String pwd;
 
-    //@Column(name = "region_id")
-    //@NotNull
-    //private int regionId;
+//    @Column(name = "region_id")
+//    @NotNull
+//    private int regionId;
 
     @Builder
     public Member( String email, String name, String phoneNumber, String pwd ) {

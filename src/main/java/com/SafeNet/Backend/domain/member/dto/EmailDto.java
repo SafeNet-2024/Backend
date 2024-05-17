@@ -1,4 +1,4 @@
-package com.SafeNet.Backend.api.Member.Dto;
+package com.SafeNet.Backend.domain.member.dto;
 
 import lombok.Data;
 

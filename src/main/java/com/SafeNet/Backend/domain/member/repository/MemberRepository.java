@@ -1,6 +1,6 @@
-package com.SafeNet.Backend.api.Member.Repository;
+package com.SafeNet.Backend.domain.member.repository;
 
-import com.SafeNet.Backend.api.Member.Entity.Member;
+import com.SafeNet.Backend.domain.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,4 +1,4 @@
-package com.SafeNet.Backend.api.Member.Entity;
+package com.SafeNet.Backend.domain.member.entity;
 
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

@@ -1,11 +1,11 @@
-package com.SafeNet.Backend.api.Member.Controller;
+package com.SafeNet.Backend.domain.member.controller;
 
-import com.SafeNet.Backend.api.Member.Dto.EmailDto;
-import com.SafeNet.Backend.api.Member.Dto.LoginRequestDto;
-import com.SafeNet.Backend.api.Member.Dto.SignupRequestDto;
-import com.SafeNet.Backend.api.Member.Dto.TokenResponseDto;
-import com.SafeNet.Backend.api.Member.Service.EmailService;
-import com.SafeNet.Backend.api.Member.Service.MemberService;
+import com.SafeNet.Backend.domain.member.dto.EmailDto;
+import com.SafeNet.Backend.domain.member.dto.LoginRequestDto;
+import com.SafeNet.Backend.domain.member.dto.SignupRequestDto;
+import com.SafeNet.Backend.domain.member.dto.TokenResponseDto;
+import com.SafeNet.Backend.domain.member.service.EmailService;
+import com.SafeNet.Backend.domain.member.service.MemberService;
 import com.SafeNet.Backend.global.exception.CustomException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
