@@ -1,7 +1,7 @@
-package com.SafeNet.Backend.domain.message.domain;
+package com.SafeNet.Backend.domain.message.entity;
 
 
-import com.SafeNet.Backend.domain.messageRoom.domain.MessageRoom;
+import com.SafeNet.Backend.domain.messageroom.entity.MessageRoom;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,10 +26,12 @@ public class Message {
     @Column(name = "message_id")
     private Long id;
 
+    @Column(nullable = false)
     private String sender;
 
     private String receiver;
 
+    @Column(nullable = false)
     private String message;
 
     @CreationTimestamp
@@ -37,6 +39,6 @@ public class Message {
     private LocalDateTime sentTime;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "room_id", referencedColumnName = "room_id")
+    @JoinColumn(name = "room_id", referencedColumnName = "room_id", nullable = false)
     private MessageRoom messageRoom;
 }

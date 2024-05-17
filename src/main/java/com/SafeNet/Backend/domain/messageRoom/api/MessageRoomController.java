@@ -1,10 +1,10 @@
-package com.SafeNet.Backend.domain.messageRoom.api;
+package com.SafeNet.Backend.domain.messageroom.api;
 
-import com.SafeNet.Backend.domain.member.domain.Member;
+import com.SafeNet.Backend.domain.member.entity.Member;
 import com.SafeNet.Backend.domain.message.dto.MessageRequestDto;
 import com.SafeNet.Backend.domain.message.dto.MessageResponseDto;
-import com.SafeNet.Backend.domain.messageRoom.dto.MessageRoomDto;
-import com.SafeNet.Backend.domain.messageRoom.service.MessageRoomService;
+import com.SafeNet.Backend.domain.messageroom.dto.MessageRoomDto;
+import com.SafeNet.Backend.domain.messageroom.service.MessageRoomService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
