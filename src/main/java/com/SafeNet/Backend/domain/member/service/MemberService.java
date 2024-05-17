@@ -1,6 +1,6 @@
 package com.SafeNet.Backend.domain.member.service;
 
-import com.SafeNet.Backend.domain.member.domain.Member;
+import com.SafeNet.Backend.domain.member.entity.Member;
 import com.SafeNet.Backend.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

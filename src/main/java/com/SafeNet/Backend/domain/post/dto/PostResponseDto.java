@@ -1,6 +1,6 @@
 package com.SafeNet.Backend.domain.post.dto;
 
-import com.SafeNet.Backend.domain.post.domain.Category;
+import com.SafeNet.Backend.domain.post.entity.Category;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;

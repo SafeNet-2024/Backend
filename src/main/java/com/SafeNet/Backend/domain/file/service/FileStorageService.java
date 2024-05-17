@@ -1,7 +1,7 @@
 package com.SafeNet.Backend.domain.file.service;
 
-import com.SafeNet.Backend.domain.file.domain.File;
-import com.SafeNet.Backend.domain.file.domain.FileType;
+import com.SafeNet.Backend.domain.file.entity.File;
+import com.SafeNet.Backend.domain.file.entity.FileType;
 import com.SafeNet.Backend.domain.file.exception.FileStorageException;
 import com.SafeNet.Backend.domain.file.repository.FileRepository;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,12 +1,12 @@
 package com.SafeNet.Backend.domain.messageroom.service;
 
-import com.SafeNet.Backend.domain.member.domain.Member;
+import com.SafeNet.Backend.domain.member.entity.Member;
 import com.SafeNet.Backend.domain.member.repository.MemberRepository;
 import com.SafeNet.Backend.domain.message.dto.MessageRequestDto;
 import com.SafeNet.Backend.domain.message.dto.MessageResponseDto;
 import com.SafeNet.Backend.domain.messageroom.dto.MessageRoomDto;
 import com.SafeNet.Backend.domain.messageroom.repository.MessageRoomRepository;
-import com.SafeNet.Backend.domain.post.domain.Post;
+import com.SafeNet.Backend.domain.post.entity.Post;
 import com.SafeNet.Backend.domain.post.repository.PostRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;

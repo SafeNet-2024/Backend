@@ -1,6 +1,6 @@
 package com.SafeNet.Backend.domain.member.repository;
 
-import com.SafeNet.Backend.domain.member.domain.Member;
+import com.SafeNet.Backend.domain.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 

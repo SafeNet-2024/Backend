@@ -1,7 +1,7 @@
-package com.SafeNet.Backend.domain.region.domain;
+package com.SafeNet.Backend.domain.region.entity;
 
-import com.SafeNet.Backend.domain.member.domain.Member;
-import com.SafeNet.Backend.domain.post.domain.Post;
+import com.SafeNet.Backend.domain.member.entity.Member;
+import com.SafeNet.Backend.domain.post.entity.Post;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

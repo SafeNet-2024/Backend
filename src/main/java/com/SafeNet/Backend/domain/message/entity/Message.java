@@ -1,7 +1,7 @@
-package com.SafeNet.Backend.domain.message.domain;
+package com.SafeNet.Backend.domain.message.entity;
 
 
-import com.SafeNet.Backend.domain.messageroom.domain.MessageRoom;
+import com.SafeNet.Backend.domain.messageroom.entity.MessageRoom;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

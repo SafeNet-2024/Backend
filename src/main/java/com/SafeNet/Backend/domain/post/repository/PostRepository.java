@@ -1,6 +1,6 @@
 package com.SafeNet.Backend.domain.post.repository;
 
-import com.SafeNet.Backend.domain.post.domain.Post;
+import com.SafeNet.Backend.domain.post.entity.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

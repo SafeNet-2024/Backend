@@ -1,6 +1,6 @@
 package com.SafeNet.Backend.domain.postLike.repository;
 
-import com.SafeNet.Backend.domain.postLike.domain.PostLike;
+import com.SafeNet.Backend.domain.postLike.entity.PostLike;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

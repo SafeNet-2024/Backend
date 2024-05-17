@@ -1,8 +1,8 @@
 package com.SafeNet.Backend;
 
-import com.SafeNet.Backend.domain.member.domain.Member;
+import com.SafeNet.Backend.domain.member.entity.Member;
 import com.SafeNet.Backend.domain.member.repository.MemberRepository;
-import com.SafeNet.Backend.domain.region.domain.Region;
+import com.SafeNet.Backend.domain.region.entity.Region;
 import com.SafeNet.Backend.domain.region.repository.RegionRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;

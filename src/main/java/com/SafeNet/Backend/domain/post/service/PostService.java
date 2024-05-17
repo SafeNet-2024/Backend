@@ -1,19 +1,19 @@
 package com.SafeNet.Backend.domain.post.service;
 
-import com.SafeNet.Backend.domain.file.domain.File;
-import com.SafeNet.Backend.domain.file.domain.FileType;
+import com.SafeNet.Backend.domain.file.entity.File;
+import com.SafeNet.Backend.domain.file.entity.FileType;
 import com.SafeNet.Backend.domain.file.service.FileStorageService;
-import com.SafeNet.Backend.domain.member.domain.Member;
+import com.SafeNet.Backend.domain.member.entity.Member;
 import com.SafeNet.Backend.domain.member.service.MemberService;
-import com.SafeNet.Backend.domain.post.domain.Post;
-import com.SafeNet.Backend.domain.post.domain.PostStatus;
+import com.SafeNet.Backend.domain.post.entity.Post;
+import com.SafeNet.Backend.domain.post.entity.PostStatus;
 import com.SafeNet.Backend.domain.post.dto.PostRequestDto;
 import com.SafeNet.Backend.domain.post.dto.PostResponseDto;
 import com.SafeNet.Backend.domain.post.exception.PostException;
 import com.SafeNet.Backend.domain.post.repository.PostRepository;
-import com.SafeNet.Backend.domain.postLike.domain.PostLike;
+import com.SafeNet.Backend.domain.postLike.entity.PostLike;
 import com.SafeNet.Backend.domain.postLike.repository.PostLikeRepository;
-import com.SafeNet.Backend.domain.region.domain.Region;
+import com.SafeNet.Backend.domain.region.entity.Region;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
