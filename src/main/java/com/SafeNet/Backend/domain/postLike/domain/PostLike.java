@@ -1,5 +1,6 @@
 package com.SafeNet.Backend.domain.postLike.domain;
 
+import com.SafeNet.Backend.domain.member.domain.Member;
 import com.SafeNet.Backend.domain.post.domain.Post;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -36,4 +37,8 @@ public class PostLike {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;  // Member와의 관계 추가
 }

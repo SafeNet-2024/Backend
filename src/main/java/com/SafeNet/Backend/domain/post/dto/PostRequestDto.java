@@ -16,8 +16,8 @@ import lombok.NoArgsConstructor;
 public class PostRequestDto {
     private Category category;
     private String title;
-    private Integer cost;
-    private Integer count;
+    private int cost;
+    private int count;
     private String buyDate; // LocalDate 대신 String으로 받음
     private String contents;
 }

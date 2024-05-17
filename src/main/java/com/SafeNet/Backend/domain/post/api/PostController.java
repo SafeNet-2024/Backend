@@ -2,7 +2,9 @@ package com.SafeNet.Backend.domain.post.api;
 
 import com.SafeNet.Backend.domain.post.dto.PostRequestDto;
 import com.SafeNet.Backend.domain.post.dto.PostResponseDto;
+import com.SafeNet.Backend.domain.post.exception.PostException;
 import com.SafeNet.Backend.domain.post.service.PostService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/posts")
@@ -24,51 +27,46 @@ public class PostController {
     public ResponseEntity<String> createPost(@RequestPart("post") String postRequestDtoJson,
                                              @RequestPart("receiptImage") MultipartFile receiptImage,
                                              @RequestPart("productImage") MultipartFile productImage,
-                                             @RequestParam("memberId") Long memberId) {
-        try {
-            PostRequestDto postRequestDto = new ObjectMapper().readValue(postRequestDtoJson, PostRequestDto.class); // JSON 객체를 PostRequestDto로 변환
-            postService.createPost(postRequestDto, receiptImage, productImage, memberId);
-            return new ResponseEntity<>("Post created successfully", HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Failed to create post: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+                                             @RequestParam("memberId") Long memberId) throws JsonProcessingException {
+        PostRequestDto postRequestDto = new ObjectMapper().readValue(postRequestDtoJson, PostRequestDto.class); // JSON 객체를 PostRequestDto로
+        postService.createPost(postRequestDto, receiptImage, productImage, memberId);
+        return new ResponseEntity<>("Post created successfully", HttpStatus.CREATED);
     }
 
+
     @GetMapping
-    public List<PostResponseDto> getAllPosts() {
-        return postService.getAllPosts();
+    public ResponseEntity<?> getAllPosts() {
+        List<PostResponseDto> allPosts = postService.getAllPosts();
+        if (allPosts.isEmpty()) {
+            return new ResponseEntity<>("등록된 게시물이 없습니다.", HttpStatus.OK);
+        }
+        return new ResponseEntity<>(allPosts, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PostResponseDto> getPostById(@PathVariable("id") Long id) {
-        try {
-            return new ResponseEntity<>(postService.getPostById(id), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<?> getPostById(@PathVariable("id") Long id) {
+        Optional<PostResponseDto> postById = postService.getPostById(id);
+        return new ResponseEntity<>(postById, HttpStatus.OK);
     }
 
     @PatchMapping(value = "/{id}", consumes = {"multipart/form-data"})
     public ResponseEntity<String> updatePost(@PathVariable("id") Long id,
                                              @RequestPart("post") String postRequestDtoJson,
                                              @RequestPart(value = "receiptImage", required = false) MultipartFile receiptImage,
-                                             @RequestPart(value = "productImage", required = false) MultipartFile productImage) {
-        try {
-            PostRequestDto postRequestDto = new ObjectMapper().readValue(postRequestDtoJson, PostRequestDto.class);
-            postService.updatePost(id, postRequestDto, receiptImage, productImage);
-            return new ResponseEntity<>("Post updated successfully", HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Failed to update post: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+                                             @RequestPart(value = "productImage", required = false) MultipartFile productImage) throws JsonProcessingException {
+        PostRequestDto postRequestDto = new ObjectMapper().readValue(postRequestDtoJson, PostRequestDto.class);
+        postService.updatePost(id, postRequestDto, receiptImage, productImage);
+        return new ResponseEntity<>("Post updated successfully", HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deletePost(@PathVariable("id") Long id) {
-        try {
-            postService.deletePost(id);
-            return new ResponseEntity<>("Post deleted successfully", HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Failed to delete post: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        postService.deletePost(id);
+        return new ResponseEntity<>("Post deleted successfully", HttpStatus.OK);
+    }
+
+    @ExceptionHandler(PostException.class)
+    public ResponseEntity<String> handleCustomException(PostException e) {
+        return new ResponseEntity<>(e.getMessage(), e.getStatus());
     }
 }

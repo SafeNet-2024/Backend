@@ -18,6 +18,6 @@ public class PostResponseDto {
     private String buyDate; // LocalDate 대신 String으로 받음
     private String contents;
     private String writer;
-    private int price;
+    private int cost;
 }
 
