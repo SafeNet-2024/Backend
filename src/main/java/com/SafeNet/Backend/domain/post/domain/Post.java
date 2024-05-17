@@ -66,7 +66,7 @@ public class Post {
     @Enumerated(EnumType.STRING)
     @Builder.Default
     @Column(nullable = false)
-    private PostStatus status = PostStatus.AVAILABLE; // 기본값: 거래가능
+    private PostStatus postStatus = PostStatus.거래가능; // 기본값: 거래가능
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -95,8 +95,8 @@ public class Post {
     private List<File> fileList; // 단방향
 
     // 업데이트 메서드
-    public Post updatePost(PostRequestDto dto, LocalDate parsedBuyDate, List<File> fileList) {
-        return this.toBuilder()
+    public void updatePost(PostRequestDto dto, LocalDate parsedBuyDate, List<File> fileList) {
+        this.toBuilder()
                 .title(dto.getTitle())
                 .category(dto.getCategory())
                 .cost(dto.getCost())

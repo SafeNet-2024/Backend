@@ -48,10 +48,9 @@ public class Member {
     @JsonIgnore
     private List<Post> postList;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "member_id")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private List<PostLike> postLikeList; // 단방향 참조
+    private List<PostLike> postLikeList;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "member_id")
