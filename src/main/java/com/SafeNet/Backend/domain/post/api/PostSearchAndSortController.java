@@ -31,4 +31,17 @@ public class PostSearchAndSortController {
         List<PostResponseDto> posts = postSearchAndSortService.searchByCategory(category);
         return ResponseEntity.ok(posts);
     }
+
+    @GetMapping("/sort/created")
+    public ResponseEntity<List<PostResponseDto>> sortByCreated() {
+        List<PostResponseDto> posts = postSearchAndSortService.sortByCreated();
+        return ResponseEntity.ok(posts);
+    }
+
+    @GetMapping("/sort/buyDate")
+    public ResponseEntity<List<PostResponseDto>> sortByBuyDate() {
+        List<PostResponseDto> posts = postSearchAndSortService.sortByBuyDate();
+        return ResponseEntity.ok(posts);
+    }
 }
+

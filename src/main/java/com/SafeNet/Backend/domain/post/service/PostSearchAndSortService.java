@@ -37,6 +37,24 @@ public class PostSearchAndSortService {
         }
     }
 
+    public List<PostResponseDto> sortByCreated() { // 글 등록된 순(최신순)으로 게시글을 정렬하는 로직
+        try {
+            List<Post> posts = postRepository.findAllByOrderByCreatedDesc();
+            return posts.stream().map(this::convertToDto).collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new PostException("Failed to retrieve posts by created date", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public List<PostResponseDto> sortByBuyDate() { // 구매날짜 최신순으로 게시글을 정렬하는 로직
+        try {
+            List<Post> posts = postRepository.findAllByOrderByBuyDateDesc();
+            return posts.stream().map(this::convertToDto).collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new PostException("Failed to retrieve posts by buy date", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     private PostResponseDto convertToDto(Post post) {
         return PostResponseDto.builder()
                 .postId(post.getId())
