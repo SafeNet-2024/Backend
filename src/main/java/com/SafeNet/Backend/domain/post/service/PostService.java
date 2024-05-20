@@ -11,7 +11,6 @@ import com.SafeNet.Backend.domain.post.dto.PostRequestDto;
 import com.SafeNet.Backend.domain.post.dto.PostResponseDto;
 import com.SafeNet.Backend.domain.post.exception.PostException;
 import com.SafeNet.Backend.domain.post.repository.PostRepository;
-import com.SafeNet.Backend.domain.postLike.entity.PostLike;
 import com.SafeNet.Backend.domain.postLike.repository.PostLikeRepository;
 import com.SafeNet.Backend.domain.region.entity.Region;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +31,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
-    private final PostLikeRepository postLikeRepository;
     private final FileStorageService fileStorageService;
     private final MemberService memberService;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일");
@@ -139,24 +137,6 @@ public class PostService {
         }
     }
 
-    public List<PostResponseDto> getPostsByMemberId(Long memberId) {
-        try {
-            List<Post> posts = postRepository.findByMember_Id(memberId);
-            return posts.stream().map(this::convertToDto).collect(Collectors.toList());
-        } catch (Exception e) {
-            throw new PostException("Failed to retrieve posts by memberId", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    public List<PostResponseDto> getLikedPostsByMemberId(Long memberId) {
-        try {
-            List<PostLike> postLikes = postLikeRepository.findByMember_Id(memberId);
-            return postLikes.stream().map(postLike -> this.convertToDto(postLike.getPost())).collect(Collectors.toList());
-        } catch (Exception e) {
-            throw new PostException("Failed to retrieve liked posts by memberId", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     private PostResponseDto convertToDto(Post post) {
         return PostResponseDto.builder()
                 .postId(post.getId())
@@ -167,4 +147,6 @@ public class PostService {
                 .cost(post.getCost())
                 .build();
     }
+
+
 }
