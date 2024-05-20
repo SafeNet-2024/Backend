@@ -2,21 +2,19 @@ package com.SafeNet.Backend.domain.post.api;
 
 import com.SafeNet.Backend.domain.post.dto.PostResponseDto;
 import com.SafeNet.Backend.domain.post.entity.Category;
+import com.SafeNet.Backend.domain.post.exception.PostException;
 import com.SafeNet.Backend.domain.post.service.PostSearchAndSortService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/posts")
 @RequiredArgsConstructor
-@Tag(name = "Post Query", description = "Post Query API")
+@Tag(name = "Post Query", description = "게시글 특정 조건 조회 및 정렬 API")
 public class PostSearchAndSortController {
     private final PostSearchAndSortService postSearchAndSortService;
 
@@ -42,6 +40,10 @@ public class PostSearchAndSortController {
     public ResponseEntity<List<PostResponseDto>> sortByBuyDate() {
         List<PostResponseDto> posts = postSearchAndSortService.sortByBuyDate();
         return ResponseEntity.ok(posts);
+    }
+    @ExceptionHandler(PostException.class)
+    public ResponseEntity<String> handleCustomException(PostException e) {
+        return ResponseEntity.status(e.getStatus()).body(e.getMessage());
     }
 }
 
