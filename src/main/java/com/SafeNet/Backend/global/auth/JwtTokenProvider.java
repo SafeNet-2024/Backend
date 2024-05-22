@@ -119,7 +119,7 @@ public class JwtTokenProvider {
  */
 
     public String resolveToken(HttpServletRequest req) {
-        String bearerToken = req.getHeader("Authorization");
+        String bearerToken = req.getHeader("ACCESS_TOKEN");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
@@ -147,5 +147,14 @@ public class JwtTokenProvider {
     public void setHeaderToken(HttpServletResponse response, TokenResponseDto dto) {
         response.setHeader("Access_Token", dto.getAccessToken());
         response.setHeader("Refresh_Token", dto.getRefreshToken());
+    }
+
+    /*
+     * 로그아웃 로직 - Refresh 토큰을 redis에서 삭제
+     */
+    public void logout(String email) {
+        if(tokenRedisTemplate.opsForValue().get("JWT_TOKEN:" + email) != null) {
+            tokenRedisTemplate.delete(email);
+        }
     }
 }
