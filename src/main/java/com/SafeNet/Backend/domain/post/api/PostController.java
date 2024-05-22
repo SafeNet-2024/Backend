@@ -68,8 +68,22 @@ public class PostController {
         postService.deletePost(id);
         return ResponseEntity.ok("Post deleted successfully");
     }
+
+    @PatchMapping("/{id}/status/trading")
+    public ResponseEntity<String> updatePostStatusToTrading(@PathVariable("id") Long id) {
+        postService.updatePostStatusToTrading(id);
+        return ResponseEntity.ok("Post status updated to trading");
+    }
+
+    @PatchMapping("/{id}/status/completed")
+    public ResponseEntity<String> updatePostStatusToCompleted(@PathVariable("id") Long id) {
+        postService.updatePostStatusToCompleted(id);
+        return ResponseEntity.ok("Post status updated to completed");
+    }
+
     @ExceptionHandler(PostException.class)
     public ResponseEntity<String> handleCustomException(PostException e) {
         return ResponseEntity.status(e.getStatus()).body(e.getMessage());
     }
+
 }

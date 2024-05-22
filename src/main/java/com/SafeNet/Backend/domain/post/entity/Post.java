@@ -106,4 +106,8 @@ public class Post {
                 .fileList(fileList)
                 .build();
     }
+
+    public void setPostStatus(PostStatus postStatus) {
+        this.postStatus = postStatus;
+    }
 }

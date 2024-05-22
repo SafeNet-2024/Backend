@@ -11,7 +11,6 @@ import com.SafeNet.Backend.domain.post.dto.PostRequestDto;
 import com.SafeNet.Backend.domain.post.dto.PostResponseDto;
 import com.SafeNet.Backend.domain.post.exception.PostException;
 import com.SafeNet.Backend.domain.post.repository.PostRepository;
-import com.SafeNet.Backend.domain.postLike.repository.PostLikeRepository;
 import com.SafeNet.Backend.domain.region.entity.Region;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -137,6 +136,20 @@ public class PostService {
         } catch (Exception e) {
             throw new PostException("Failed to delete post", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @Transactional
+    public void updatePostStatusToTrading(Long id) {
+        Post post = postRepository.findById(id).orElseThrow(() -> new PostException("Post not found", HttpStatus.NOT_FOUND));
+        post.setPostStatus(PostStatus.거래중);
+        postRepository.save(post);
+    }
+
+    @Transactional
+    public void updatePostStatusToCompleted(Long id) {
+        Post post = postRepository.findById(id).orElseThrow(() -> new PostException("Post not found", HttpStatus.NOT_FOUND));
+        post.setPostStatus(PostStatus.거래완료);
+        postRepository.save(post);
     }
 
     private PostResponseDto convertToDto(Post post) {
