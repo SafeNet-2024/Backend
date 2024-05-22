@@ -52,7 +52,7 @@ public class InitDB {
                         .phoneNumber("010-3333-4444")
                         .email(memberEmail)
                         .pwd("3333")
-                        //.region(region)
+                        .region(region)
                         .build();
                 memberRepository.save(member);
             }

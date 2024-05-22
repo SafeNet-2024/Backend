@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -23,13 +24,10 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
-
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class JwtTokenProvider {
-
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, String> tokenRedisTemplate;
     @Value("${jwt.secret.key}")
     private String secretKey;
     private Key key;
@@ -40,6 +38,10 @@ public class JwtTokenProvider {
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
+
+    public JwtTokenProvider(@Qualifier("tokenRedisTemplate") RedisTemplate<String, String> tokenRedisTemplate) {
+        this.tokenRedisTemplate = tokenRedisTemplate;
+    }
 
     // bean으로 등록 되면서 딱 한번 실행
     @PostConstruct
@@ -85,7 +87,7 @@ public class JwtTokenProvider {
                 .compact();
 
         // redis에 저장
-        redisTemplate.opsForValue().set(
+        tokenRedisTemplate.opsForValue().set(
                 authentication.getName(),
                 refreshToken,
                 refreshExpirationTime,

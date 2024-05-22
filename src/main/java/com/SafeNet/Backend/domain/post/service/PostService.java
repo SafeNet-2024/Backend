@@ -4,7 +4,7 @@ import com.SafeNet.Backend.domain.file.entity.File;
 import com.SafeNet.Backend.domain.file.entity.FileType;
 import com.SafeNet.Backend.domain.file.service.FileStorageService;
 import com.SafeNet.Backend.domain.member.entity.Member;
-import com.SafeNet.Backend.domain.member.service.MemberService;
+import com.SafeNet.Backend.domain.member.repository.MemberRepository;
 import com.SafeNet.Backend.domain.post.entity.Post;
 import com.SafeNet.Backend.domain.post.entity.PostStatus;
 import com.SafeNet.Backend.domain.post.dto.PostRequestDto;
@@ -34,7 +34,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
     private final FileStorageService fileStorageService;
-    private final MemberService memberService;
+    private final MemberRepository memberRepository;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일");
 
     @Transactional
@@ -44,7 +44,7 @@ public class PostService {
             LocalDate parsedBuyDate = LocalDate.parse(postRequestDto.getBuyDate(), formatter);
 
             // 사용자 정보로 Member 객체 조회
-            Member member = memberService.findById(memberId);
+            Member member = memberRepository.findById(memberId).orElseThrow();
             Region region = member.getRegion();
 
             // 파일 처리

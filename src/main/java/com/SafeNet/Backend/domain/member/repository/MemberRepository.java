@@ -9,6 +9,6 @@ import java.util.Optional;
 @Repository
 public interface MemberRepository extends JpaRepository<Member,String> {
     Optional<Member> findByEmail(String email);//Optional<Member> NPE 발생을 방지
-
+    Optional<Member> findById(Long id);
     boolean existsMemberByName(String name);
 }

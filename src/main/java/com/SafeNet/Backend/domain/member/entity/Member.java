@@ -1,11 +1,11 @@
 package com.SafeNet.Backend.domain.member.entity;
 
+import com.SafeNet.Backend.domain.region.entity.Region;
 import com.SafeNet.Backend.global.util.BaseTimeEntity;
 import com.SafeNet.Backend.domain.file.entity.File;
 import com.SafeNet.Backend.domain.postLike.entity.PostLike;
 import com.SafeNet.Backend.domain.messageroom.entity.MessageRoom;
 import com.SafeNet.Backend.domain.post.entity.Post;
-import com.SafeNet.Backend.domain.region.entity.Region;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -24,6 +24,7 @@ import static jakarta.persistence.FetchType.LAZY;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "member")
 public class Member extends BaseTimeEntity implements UserDetails {
@@ -47,11 +48,9 @@ public class Member extends BaseTimeEntity implements UserDetails {
     private String pwd;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "region_id", nullable = false)
+    @JoinColumn(name = "region_id")
+    //@NotNull
     private Region region;
-//    @Column(name = "region_id")
-//    @NotNull
-//    private int regionId;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
@@ -69,17 +68,6 @@ public class Member extends BaseTimeEntity implements UserDetails {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<PostLike> postLikeList;
-
-
-    @Builder
-    public Member( String email, String name, String phoneNumber, String pwd ) {
-        this.email=email;
-        this.name= name;
-        this.phoneNumber= phoneNumber;
-        this.pwd= pwd;
-        //this.regionId =regionId;
-
-    }
 
     public Long getId() {
         return id;
