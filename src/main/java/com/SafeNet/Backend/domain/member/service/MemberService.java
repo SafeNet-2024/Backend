@@ -4,6 +4,7 @@ import com.SafeNet.Backend.domain.member.dto.LoginRequestDto;
 import com.SafeNet.Backend.domain.member.dto.SignupRequestDto;
 import com.SafeNet.Backend.domain.member.dto.TokenResponseDto;
 import com.SafeNet.Backend.domain.member.entity.Member;
+import com.SafeNet.Backend.domain.member.entity.UserDetailsImpl;
 import com.SafeNet.Backend.domain.member.repository.MemberRepository;
 import com.SafeNet.Backend.global.auth.JwtTokenProvider;
 import com.SafeNet.Backend.global.exception.CustomException;
@@ -36,11 +37,11 @@ public class MemberService {
         Optional<Member> valiMember = memberRepository.findByEmail(signupRequestDto.getEmail());
         // 중복가입 방지
         if (valiMember.isPresent()) {
-            throw new CustomException("This email is already Exist ");
+            throw new CustomException(" This email is already Exist ");
         }
         // 닉네임 중복검사
         else if (memberRepository.existsMemberByName(signupRequestDto.getName())) {
-            throw new CustomException("This nickName is already Exist ");
+            throw new CustomException(" This nickName is already Exist ");
         }
         Member member = Member.builder()
                 .email(signupRequestDto.getEmail())
@@ -91,6 +92,15 @@ public class MemberService {
                 log.error("로그인 시도 중 예외 발생: {}", e.getMessage(), e);
                 throw new CustomException("로그인 중 알 수 없는 오류가 발생했습니다. " + e.getMessage());
             }
+        }
+    }
+
+    public void logout(String email) {
+        //Token에서 로그인한 사용자 정보 get해 로그아웃 처리
+        try {
+            jwtTokenProvider.logout("JWT_TOKEN:" + email); //Token 삭제
+        }catch (CustomException ex) {
+            throw new CustomException("이미 로그아웃된 유저입니다");
         }
     }
 }

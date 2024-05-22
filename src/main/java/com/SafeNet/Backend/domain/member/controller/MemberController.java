@@ -1,6 +1,7 @@
 package com.SafeNet.Backend.domain.member.controller;
 
 import com.SafeNet.Backend.domain.member.dto.*;
+import com.SafeNet.Backend.domain.member.entity.UserDetailsImpl;
 import com.SafeNet.Backend.domain.member.service.EmailService;
 import com.SafeNet.Backend.domain.member.service.MemberService;
 import com.SafeNet.Backend.domain.message.dto.MessageDto;
@@ -12,14 +13,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name= "Member Controller", description = "회원 API")
 @Slf4j
@@ -61,15 +61,16 @@ public class MemberController {
 
     @Operation(summary = "이메일 인증", description = "이메일 인증번호를 입력받은 메일로 전송합니다.")
     @PostMapping("/sendCode")
-    public ResponseEntity<String> mailSend(EmailDto emailDto) throws MessagingException {
+    public ResponseEntity<AuthCodeResponseDto> mailSend(EmailDto emailDto) throws MessagingException {
+        //TODO: 이메일 중복 체크
         log.info("EmailController.mailSend()");
-        int number = mailService.sendMail(emailDto.getMail());
+        int number = mailService.sendMail(emailDto.getEmail());
 
         String num = "" + number;
-        return ResponseEntity.ok(num);
+        return ResponseEntity.ok(AuthCodeResponseDto.builder().AuthenticationCode(num).build());
     }
 
-    @Operation(summary = "로그인", description = "로그인을 승인합니다.")
+    @Operation(summary = "로그인", description = "토큰을 발급하고 redis에 저장합니다.")
     @PostMapping("/login")
     public ResponseEntity<TokenResponseDto> login(@RequestBody LoginRequestDto loginRequestDto){
         TokenResponseDto token= null;
@@ -87,6 +88,18 @@ public class MemberController {
 
     }
 
+    @PostMapping(value = "/logout")
+    @Operation(summary = "로그아웃", description = "JWt 토큰을 redis에서 삭제합니다")
+    public ResponseEntity<Void> logout(            @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
+                                                   @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserDetailsImpl userDetails = (UserDetailsImpl) principal;
+        String email = userDetails.getUsername();
+        log.info("토큰으로부터 이메일을 추출하였습니다.: "+email);
+        memberService.logout(email);
+        return ResponseEntity.ok().build();
+    }
 
+    //TODO: 위치정보 저장 api 필요
 
 }
