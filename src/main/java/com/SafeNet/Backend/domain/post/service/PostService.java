@@ -86,7 +86,9 @@ public class PostService {
                         .cost(post.getCost())
                         .count(post.getCount())
                         .buyDate(post.getBuyDate().toString())
-                        .category(post.getCategory()).build())
+                        .category(post.getCategory())
+                        .likeCount(post.getPostLikeList().size())
+                        .build())
                 .orElseThrow(() -> new PostException("Post not found with id: " + id, HttpStatus.NOT_FOUND)));
     }
 
