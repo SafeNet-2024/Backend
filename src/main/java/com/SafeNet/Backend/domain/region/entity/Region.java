@@ -16,6 +16,7 @@ import java.util.List;
 @Builder
 @Entity
 @Getter
+@Table(name = "region")
 public class Region {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
