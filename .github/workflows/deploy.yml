@@ -74,3 +74,5 @@ jobs:
             docker tag ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${GITHUB_SHA::7} gc_spring
             docker-compose up -d
             docker image prune -f
+          timeout: 60s
+          debug: true
