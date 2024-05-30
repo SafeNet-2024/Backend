@@ -19,6 +19,7 @@ bin/
 
 ### IntelliJ IDEA ###
 application-aws.yml
+application-s3.yml
 .idea
 *.iws
 *.iml
