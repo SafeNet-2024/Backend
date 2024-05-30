@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,11 +25,11 @@ public class PostController {
     private final PostService postService;
     private final ObjectMapper objectMapper;
 
-    @PostMapping(consumes = {"multipart/form-data"})
-    public ResponseEntity<String> createPost(@RequestPart("post") String postRequestDtoJson,
-                                             @RequestPart("receiptImage") MultipartFile receiptImage,
-                                             @RequestPart("productImage") MultipartFile productImage,
-                                             @RequestParam("memberId") Long memberId) throws JsonProcessingException {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> createPost(@RequestPart(value = "post") String postRequestDtoJson,
+                                             @RequestPart(value = "receiptImage") MultipartFile receiptImage,
+                                             @RequestPart(value = "productImage") MultipartFile productImage,
+                                             @RequestParam(value = "memberId") Long memberId) throws JsonProcessingException {
         PostRequestDto postRequestDto = objectMapper.readValue(postRequestDtoJson, PostRequestDto.class); // JSON 객체를 PostRequestDto로 변환
         postService.createPost(postRequestDto, receiptImage, productImage, memberId);
         return ResponseEntity.status(HttpStatus.CREATED).body("Post created successfully");
@@ -85,5 +86,4 @@ public class PostController {
     public ResponseEntity<String> handleCustomException(PostException e) {
         return ResponseEntity.status(e.getStatus()).body(e.getMessage());
     }
-
 }
