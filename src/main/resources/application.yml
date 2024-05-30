@@ -10,7 +10,7 @@ spring:
       host: localhost
       port: 6379
   profiles:
-    include: aws
+    include: aws, s3
   devtools:
     restart:
       enabled: false
