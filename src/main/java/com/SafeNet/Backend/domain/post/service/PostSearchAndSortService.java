@@ -60,7 +60,7 @@ public class PostSearchAndSortService {
                 .postId(post.getId())
                 .title(post.getTitle())
                 .likeCount(post.getPostLikeList().size())
-                .imageUrl(post.getFileList().isEmpty() ? null : post.getFileList().get(1).getFileUrl())
+                .productImageUrl(post.getFileList().isEmpty() ? null : post.getFileList().get(1).getFileUrl())
                 .count(post.getCount())
                 .cost(post.getCost())
                 .build();
