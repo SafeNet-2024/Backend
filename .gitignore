@@ -18,8 +18,7 @@ bin/
 !**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
-application-aws.yml
-application-s3.yml
+application.properties
 .idea
 *.iws
 *.iml
@@ -27,7 +26,7 @@ application-s3.yml
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
-
+src/main/resources/application.properties
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/

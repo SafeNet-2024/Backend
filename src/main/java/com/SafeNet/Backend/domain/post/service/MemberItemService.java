@@ -1,5 +1,7 @@
 package com.SafeNet.Backend.domain.post.service;
 
+import com.SafeNet.Backend.domain.member.entity.Member;
+import com.SafeNet.Backend.domain.member.repository.MemberRepository;
 import com.SafeNet.Backend.domain.post.dto.PostResponseDto;
 import com.SafeNet.Backend.domain.post.entity.Post;
 import com.SafeNet.Backend.domain.post.exception.PostException;
@@ -20,19 +22,22 @@ import java.util.stream.Collectors;
 public class MemberItemService {
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
+    private final MemberRepository memberRepository;
 
-    public List<PostResponseDto> getPostsByMemberId(Long memberId) {
+    public List<PostResponseDto> getPostsByMemberId(String email) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new PostException("Member not found", HttpStatus.NOT_FOUND));
         try {
-            List<Post> posts = postRepository.findByMember_Id(memberId);
+            List<Post> posts = postRepository.findByMember_Id(member.getId());
             return posts.stream().map(this::convertToDto).collect(Collectors.toList());
         } catch (Exception e) {
             throw new PostException("Failed to retrieve posts by memberId", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public List<PostResponseDto> getLikedPostsByMemberId(Long memberId) {
+    public List<PostResponseDto> getLikedPostsByMemberId(String email) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new PostException("Member not found", HttpStatus.NOT_FOUND));
         try {
-            List<PostLike> postLikes = postLikeRepository.findByMember_Id(memberId);
+            List<PostLike> postLikes = postLikeRepository.findByMember_Id(member.getId());
             return postLikes.stream().map(postLike -> this.convertToDto(postLike.getPost())).collect(Collectors.toList());
         } catch (Exception e) {
             throw new PostException("Failed to retrieve liked posts by memberId", HttpStatus.INTERNAL_SERVER_ERROR);

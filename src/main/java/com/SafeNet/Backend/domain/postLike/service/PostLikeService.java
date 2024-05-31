@@ -1,6 +1,7 @@
 package com.SafeNet.Backend.domain.postLike.service;
 
 import com.SafeNet.Backend.domain.member.entity.Member;
+import com.SafeNet.Backend.domain.member.repository.MemberRepository;
 import com.SafeNet.Backend.domain.member.service.MemberService;
 import com.SafeNet.Backend.domain.post.entity.Post;
 import com.SafeNet.Backend.domain.post.exception.PostException;
@@ -18,15 +19,15 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PostLikeService {
     private final PostLikeRepository postLikeRepository;
+
     private final PostRepository postRepository;
-    private final MemberService memberService;
+    private final MemberRepository memberRepository;
 
     @Transactional
-    public boolean likePost(Long postId, Long memberId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostException("Post not found", HttpStatus.NOT_FOUND));
-        Member member = memberService.findById(memberId);
-        Optional<PostLike> existingLike = postLikeRepository.findByPostIdAndMemberId(postId, memberId);
+    public boolean likePost(Long postId, String email) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new PostException("Post not found with id: " + postId, HttpStatus.NOT_FOUND));
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new PostException("Member not found with email: " + email, HttpStatus.NOT_FOUND));
+        Optional<PostLike> existingLike = postLikeRepository.findByPostIdAndMemberId(postId, member.getId());
 
         if (existingLike.isPresent()) {
             postLikeRepository.delete(existingLike.get());

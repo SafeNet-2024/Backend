@@ -1,4 +1,4 @@
-package com.SafeNet.Backend.domain.file.api;
+package com.SafeNet.Backend.domain.file.controller;
 
 import com.SafeNet.Backend.domain.file.service.S3Service;
 import lombok.extern.slf4j.Slf4j;
