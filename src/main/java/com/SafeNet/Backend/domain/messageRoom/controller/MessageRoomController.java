@@ -60,7 +60,7 @@ public class MessageRoomController {
     public MessageRoomDto findRoom(
             @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
             @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken,
-            @PathVariable String roomId) {
+            @PathVariable("roomId") String roomId) {
         String email = getUserEmail();
         return messageRoomService.findRoom(roomId, email);
     }
@@ -73,7 +73,7 @@ public class MessageRoomController {
     public MessageResponseDto deleteRoom(
             @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
             @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken,
-            @PathVariable String roomId) {
+            @PathVariable("roomId") String roomId) {
         String email = getUserEmail();
         return messageRoomService.deleteRoom(roomId, email);
     }

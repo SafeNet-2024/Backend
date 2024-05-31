@@ -211,6 +211,7 @@ public class MessageRoomService {
 
         // sender가 삭제하는 경우
         if (member.getName().equals(messageRoom.getSender())) {
+            log.info("messageRoom.getSender()" + messageRoom.getSender());
             updatedSender = "Not_Exist_Sender";
             deleteFromDb = "Not_Exist_Receiver".equals(messageRoom.getReceiver()); // receiver도 이미 삭제했는지 확인
         }
