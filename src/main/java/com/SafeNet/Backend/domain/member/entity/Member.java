@@ -73,6 +73,13 @@ public class Member extends BaseTimeEntity implements UserDetails {
         return id;
     }
 
+    public void updateProfile(String name, String phoneNumber, String password, Region region) {
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.pwd = password;
+        this.region = region;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
