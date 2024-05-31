@@ -25,7 +25,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/v1/posts")
 @RequiredArgsConstructor
-@Tag(name = "Post", description = "Post API")
+@Tag(name = "Post", description = "게시물 CRUD API")
 public class PostController {
     private final PostService postService;
     private final ObjectMapper objectMapper;
@@ -52,6 +52,7 @@ public class PostController {
 
 
     @GetMapping
+    @Operation(summary = "전체 게시물 불러오기", description = "전체 게시물 리스트 볼 때 사용하는 API")
     public ResponseEntity<?> getAllPosts() {
         List<PostResponseDto> allPosts = postService.getAllPosts();
         if (allPosts.isEmpty()) {
@@ -60,8 +61,9 @@ public class PostController {
         return ResponseEntity.ok(allPosts);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getPostById(@PathVariable("id") Long id) {
+    @GetMapping("/{postId}")
+    @Operation(summary = "특정 게시물 불러오기", description = "특정 게시물 상세보기 할 때 사용하는 API")
+    public ResponseEntity<?> getPostById(@PathVariable("postId") Long id) {
         Optional<PostResponseDto> postById = postService.getPostById(id);
         if (postById.isPresent()) {
             return ResponseEntity.ok(postById.get());
@@ -70,11 +72,12 @@ public class PostController {
         }
     }
 
-    @PatchMapping(value = "/{id}", consumes = {"multipart/form-data"})
+    @PatchMapping(value = "/{postId}", consumes = {"multipart/form-data"})
+    @Operation(summary = "특정 게시물 업데이트하기", description = "특정 게시물 업데이트 할 때 사용하는 API")
     public ResponseEntity<String> updatePost(
             @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
             @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken,
-            @PathVariable("id") Long id,
+            @PathVariable("postId") Long id,
             @RequestPart("post") String postRequestDtoJson,
             @RequestPart(value = "receiptImage", required = false) MultipartFile receiptImage,
             @RequestPart(value = "productImage", required = false) MultipartFile productImage) throws JsonProcessingException {
@@ -85,24 +88,27 @@ public class PostController {
         return ResponseEntity.ok("Post updated successfully");
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{postId}")
+    @Operation(summary = "특정 게시물 삭제하기", description = "특정 게시물 삭제 할 때 사용하는 API")
     public ResponseEntity<String> deletePost(
             @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
             @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken,
-            @PathVariable("id") Long id) {
+            @PathVariable("postId") Long id) {
         String email = getUserEmail();
         postService.deletePost(id, email);
         return ResponseEntity.ok("Post deleted successfully");
     }
 
-    @PatchMapping("/{id}/status/trading")
-    public ResponseEntity<String> updatePostStatusToTrading(@PathVariable("id") Long id) {
+    @PatchMapping("/{postId}/status/trading")
+    @Operation(summary = "게시물 상태 거래중으로 변경", description = "채팅방에서 '거래중'으로 변경할 때 사용하는 API")
+    public ResponseEntity<String> updatePostStatusToTrading(@PathVariable("postId") Long id) {
         postService.updatePostStatusToTrading(id);
         return ResponseEntity.ok("Post status updated to trading");
     }
 
-    @PatchMapping("/{id}/status/completed")
-    public ResponseEntity<String> updatePostStatusToCompleted(@PathVariable("id") Long id) {
+    @PatchMapping("/{postId}/status/completed")
+    @Operation(summary = "게시물 상태 거래완료로 변경", description = "채팅방에서 '거래완료'로 변경할 때 사용하는 API")
+    public ResponseEntity<String> updatePostStatusToCompleted(@PathVariable("postId") Long id) {
         postService.updatePostStatusToCompleted(id);
         return ResponseEntity.ok("Post status updated to completed");
     }

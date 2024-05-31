@@ -32,10 +32,6 @@ public class MessageRoomController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "채팅방이 성공적으로 생성되었습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MessageResponseDto.class))),
     })
-    @Parameters({
-            @Parameter(name = "receiver", description = "수신자의 사용자 이름", example = "userB"),
-            @Parameter(name = "postId", description = "게시물의 고유 ID", example = "101")
-    })
     public MessageResponseDto createRoom(
             @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
             @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken,
@@ -61,7 +57,6 @@ public class MessageRoomController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "채팅방 정보가 성공적으로 조회되었습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MessageRoomDto.class))),
     })
-    @Parameter(name = "roomId", description = "조회할 채팅방의 ID", required = true, example = "123")
     public MessageRoomDto findRoom(
             @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
             @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken,
@@ -75,7 +70,6 @@ public class MessageRoomController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "채팅방 삭제 성공", content = @Content(mediaType = "application/json")),
     })
-    @Parameter(name = "roomId", description = "삭제할 채팅방의 ID", required = true, example = "123")
     public MessageResponseDto deleteRoom(
             @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
             @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken,
