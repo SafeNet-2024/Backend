@@ -12,6 +12,7 @@ import com.SafeNet.Backend.domain.messageroom.repository.MessageRoomRepository;
 import com.SafeNet.Backend.domain.post.entity.Post;
 import com.SafeNet.Backend.domain.post.exception.PostException;
 import com.SafeNet.Backend.domain.post.repository.PostRepository;
+import com.SafeNet.Backend.global.exception.CustomException;
 import com.SafeNet.Backend.global.pubsub.RedisSubscriber;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -71,41 +72,41 @@ public class MessageRoomService {
         Post post = postRepository.findById(messageRequestDto.getPostId()).orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
         // sender와 receiver가 속해있는 채팅방 조회
-        MessageRoom messageRoom = messageRoomRepository.findBySenderAndReceiver(member.getName(), messageRequestDto.getReceiver());
+        Optional<MessageRoom> messageRoom = messageRoomRepository.findBySenderAndReceiverAndPostId(member.getName(), messageRequestDto.getReceiver(), messageRequestDto.getPostId());
+        try {
+            // 처음 쪽지방 생성한 경우와 해당 게시물에 이미 생성된 쪽지방이 아닌 경우
+            // 한 게시글에 하나의 채팅방만 생성되도록 구현
+            if (messageRoom.isEmpty()) {
+                MessageRoomDto messageRoomDto = MessageRoomDto.createMessageRoom(messageRequestDto, member);
+                // redis 저장
+                opsHashMessageRoom.put(Message_Rooms, messageRoomDto.getRoomId(), messageRoomDto);
+                // db 저장
+                MessageRoom newRoom = MessageRoom.builder()
+                        .id(messageRoomDto.getId())
+                        .roomName(messageRoomDto.getRoomName())
+                        .roomId(messageRoomDto.getRoomId())
+                        .sender(messageRoomDto.getSender())
+                        .receiver(messageRoomDto.getReceiver())
+                        .member(member)
+                        .post(post)
+                        .build();
+                MessageRoom new_messageRoom = messageRoomRepository.save(newRoom);
 
-        // 처음 쪽지방 생성한 경우와 해당 게시물에 이미 생성된 쪽지방이 아닌 경우
-        // 한 게시글에 하나의 채팅방만 생성되도록 구현
-        if (messageRoom == null ||
-                !member.getName().equals(messageRoom.getSender()) &&
-                        !messageRequestDto.getReceiver().equals(messageRoom.getReceiver()) &&
-                        !messageRequestDto.getPostId().equals(post.getId())) {
+                return MessageResponseDto.builder()
+                        .id(new_messageRoom.getId())
+                        .roomName(new_messageRoom.getRoomName())
+                        .sender(new_messageRoom.getSender())
+                        .roomId(new_messageRoom.getRoomId())
+                        .receiver(new_messageRoom.getReceiver())
+                        .postId(messageRoomDto.getPostId()).build();
 
-            MessageRoomDto messageRoomDto = MessageRoomDto.createMessageRoom(messageRequestDto, member);
-            // redis 저장
-            opsHashMessageRoom.put(Message_Rooms, messageRoomDto.getRoomId(), messageRoomDto);
-            // db 저장
-            MessageRoom newRoom = MessageRoom.builder()
-                    .id(messageRoomDto.getId())
-                    .roomName(messageRoomDto.getRoomName())
-                    .roomId(messageRoomDto.getRoomId())
-                    .sender(messageRoomDto.getSender())
-                    .receiver(messageRoomDto.getReceiver())
-                    .member(member)
-                    .post(post)
-                    .build();
-            messageRoom = messageRoomRepository.save(newRoom);
-
-            return MessageResponseDto.builder()
-                    .id(messageRoom.getId())
-                    .roomName(messageRoom.getRoomName())
-                    .sender(messageRoom.getSender())
-                    .roomId(messageRoom.getRoomId())
-                    .receiver(messageRoom.getReceiver())
-                    .postId(messageRoomDto.getPostId()).build();
-
-        } else { // 이미 생성된 채팅방인 경우 중복 생성되지 않게 해당 채팅방으로 이동
-            return MessageResponseDto.builder()
-                    .roomId(messageRoom.getRoomId()).build();
+            } else { // 이미 생성된 채팅방인 경우 중복 생성되지 않게 해당 채팅방으로 이동
+                MessageRoom existingRoom = messageRoom.get();
+                return MessageResponseDto.builder()
+                        .roomId(existingRoom.getRoomId()).build();
+            }
+        } catch (Exception ex) {
+            throw new CustomException("채팅방을 생성하던 도중: " + ex.getMessage());
         }
     }
 
