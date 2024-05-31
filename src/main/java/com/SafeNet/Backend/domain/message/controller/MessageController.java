@@ -29,8 +29,9 @@ public class MessageController {
     private final MessageService messageService;
 
     // websocket "/pub/chat/message"로 들어오는 메시징을 처리한다.
-    @Operation(summary = "메시지 발송", description = "WebSocket을 통해 메시지를 발송한다")
+
     @MessageMapping("/chat/message")
+    @Operation(summary = "메시지 발송", description = "WebSocket을 통해 메시지를 발송한다")
     public void message(MessageDto messageDto) {
         // 클라이언트 채팅방(topic) 입장, 대화를 위해 리스너와 연동
         messageRoomService.enterMessageRoom(messageDto.getRoomId());

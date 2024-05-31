@@ -8,9 +8,11 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data // getter/setter, requiredArgsController, ToString 등 합쳐놓은 세트
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class SignupRequestDto {
 
