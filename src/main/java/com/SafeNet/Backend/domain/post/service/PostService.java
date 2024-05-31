@@ -5,7 +5,7 @@ import com.SafeNet.Backend.domain.file.entity.FileType;
 import com.SafeNet.Backend.domain.file.service.FileStorageService;
 import com.SafeNet.Backend.domain.file.service.S3Service;
 import com.SafeNet.Backend.domain.member.entity.Member;
-import com.SafeNet.Backend.domain.member.service.MemberService;
+import com.SafeNet.Backend.domain.member.repository.MemberRepository;
 import com.SafeNet.Backend.domain.post.entity.Post;
 import com.SafeNet.Backend.domain.post.entity.PostStatus;
 import com.SafeNet.Backend.domain.post.dto.PostRequestDto;
@@ -32,18 +32,20 @@ import java.util.stream.Collectors;
 public class PostService {
     private final PostRepository postRepository;
     private final FileStorageService fileStorageService;
-    private final MemberService memberService;
+    private final MemberRepository memberRepository;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일");
     private final S3Service s3Service;
 
     @Transactional
-    public void createPost(PostRequestDto postRequestDto, MultipartFile receiptImage, MultipartFile productImage, Long memberId) {
+    public void createPost(PostRequestDto postRequestDto, MultipartFile receiptImage, MultipartFile productImage, String email) {
+
+        // 사용자 정보로 Member 객체 조회
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new PostException("Member not found with email: " + email, HttpStatus.NOT_FOUND));
+
         try {
             // 문자열로 받은 날짜 데이터를 LocalDate로 파싱
             LocalDate parsedBuyDate = LocalDate.parse(postRequestDto.getBuyDate(), formatter);
 
-            // 사용자 정보로 Member 객체 조회
-            Member member = memberService.findById(memberId);
             Region region = member.getRegion();
 
             // S3에 파일 업로드 및 URL 반환
@@ -99,8 +101,14 @@ public class PostService {
     }
 
     @Transactional
-    public void updatePost(Long id, PostRequestDto postRequestDto, MultipartFile receiptImage, MultipartFile productImage) {
+    public void updatePost(Long id, PostRequestDto postRequestDto, MultipartFile receiptImage, MultipartFile productImage, String email) {
         Post existingPost = postRepository.findById(id).orElseThrow(() -> new PostException("Post not found with id: " + id, HttpStatus.NOT_FOUND));
+
+        // 사용자 이메일과 게시물 작성자의 이메일 비교
+        if (!existingPost.getMember().getEmail().equals(email)) {
+            throw new PostException("You do not have permission to update this post", HttpStatus.FORBIDDEN);
+        }
+
         try {
             if (existingPost.getPostStatus() != PostStatus.거래가능) {
                 throw new PostException("Cannot update post with id: " + id + " because its status is not 'AVAILABLE'.", HttpStatus.BAD_REQUEST);
@@ -141,8 +149,14 @@ public class PostService {
     }
 
     @Transactional
-    public void deletePost(Long id) {
+    public void deletePost(Long id, String email) {
         Post post = postRepository.findById(id).orElseThrow(() -> new PostException("Post not found with id: " + id, HttpStatus.NOT_FOUND));
+
+        // 사용자 이메일과 게시물 작성자의 이메일 비교
+        if (!post.getMember().getEmail().equals(email)) {
+            throw new PostException("You do not have permission to delete this post", HttpStatus.FORBIDDEN);
+        }
+
         try {
             if (post.getPostStatus() != PostStatus.거래가능) {
                 throw new PostException("Cannot delete post with id: " + id + " because its status is not 'AVAILABLE'.", HttpStatus.BAD_REQUEST);

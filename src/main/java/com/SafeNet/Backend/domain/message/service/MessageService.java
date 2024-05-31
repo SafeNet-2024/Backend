@@ -5,8 +5,8 @@ import com.SafeNet.Backend.domain.message.dto.MessageDto;
 import com.SafeNet.Backend.domain.message.repository.MessageRepository;
 import com.SafeNet.Backend.domain.messageroom.entity.MessageRoom;
 import com.SafeNet.Backend.domain.messageroom.repository.MessageRoomRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.stereotype.Service;
@@ -17,12 +17,20 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class MessageService {
+
     private final RedisTemplate<String, MessageDto> redisTemplateMessage;
     private final MessageRepository messageRepository;
     private final MessageRoomRepository messageRoomRepository;
 
+    public MessageService(
+            @Qualifier("redisTemplateMessage") RedisTemplate<String, MessageDto> redisTemplateMessage,
+            MessageRepository messageRepository,
+            MessageRoomRepository messageRoomRepository) {
+        this.redisTemplateMessage = redisTemplateMessage;
+        this.messageRepository = messageRepository;
+        this.messageRoomRepository = messageRoomRepository;
+    }
     public void saveMessage(MessageDto messageDto) {
         MessageRoom messageRoom = messageRoomRepository.findByRoomId(messageDto.getRoomId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 쪽지방이 존재하지 않습니다."));

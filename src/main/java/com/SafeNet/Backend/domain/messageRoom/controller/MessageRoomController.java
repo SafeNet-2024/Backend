@@ -1,6 +1,7 @@
-package com.SafeNet.Backend.domain.messageroom.api;
+package com.SafeNet.Backend.domain.messageroom.controller;
 
 import com.SafeNet.Backend.domain.member.entity.Member;
+import com.SafeNet.Backend.domain.member.entity.UserDetailsImpl;
 import com.SafeNet.Backend.domain.message.dto.MessageRequestDto;
 import com.SafeNet.Backend.domain.message.dto.MessageResponseDto;
 import com.SafeNet.Backend.domain.messageroom.dto.MessageRoomDto;
@@ -14,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,9 +36,12 @@ public class MessageRoomController {
             @Parameter(name = "receiver", description = "수신자의 사용자 이름", example = "userB"),
             @Parameter(name = "postId", description = "게시물의 고유 ID", example = "101")
     })
-    public MessageResponseDto createRoom(@RequestBody MessageRequestDto messageRequestDto) {
-        // TODO accessToken에서 사용자 이름을 추출하는 로직 추가
-        return messageRoomService.createRoom(messageRequestDto, Member.builder().name("userA").build());
+    public MessageResponseDto createRoom(
+            @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
+            @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken,
+            @RequestBody MessageRequestDto messageRequestDto) {
+        String email = getUserEmail();
+        return messageRoomService.createRoom(messageRequestDto, email);
     }
 
     @GetMapping
@@ -44,8 +49,11 @@ public class MessageRoomController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "채팅방 리스트 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MessageResponseDto[].class)))
     })
-    public List<MessageResponseDto> findAllRoomByUser() {
-        return messageRoomService.findAllRoomByUser(Member.builder().name("userA").build());
+    public List<MessageResponseDto> findAllRoomByUser(
+            @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
+            @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken) {
+        String email = getUserEmail();
+        return messageRoomService.findAllRoomByUser(email);
     }
 
     @GetMapping("/{roomId}")
@@ -54,8 +62,12 @@ public class MessageRoomController {
             @ApiResponse(responseCode = "200", description = "채팅방 정보가 성공적으로 조회되었습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MessageRoomDto.class))),
     })
     @Parameter(name = "roomId", description = "조회할 채팅방의 ID", required = true, example = "123")
-    public MessageRoomDto findRoom(@PathVariable String roomId) {
-        return messageRoomService.findRoom(roomId, Member.builder().name("userA").build());
+    public MessageRoomDto findRoom(
+            @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
+            @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken,
+            @PathVariable String roomId) {
+        String email = getUserEmail();
+        return messageRoomService.findRoom(roomId, email);
     }
 
     @DeleteMapping("/{roomId}")
@@ -64,7 +76,17 @@ public class MessageRoomController {
             @ApiResponse(responseCode = "200", description = "채팅방 삭제 성공", content = @Content(mediaType = "application/json")),
     })
     @Parameter(name = "roomId", description = "삭제할 채팅방의 ID", required = true, example = "123")
-    public MessageResponseDto deleteRoom(@PathVariable String roomId) {
-        return messageRoomService.deleteRoom(roomId, Member.builder().name("userA").build());
+    public MessageResponseDto deleteRoom(
+            @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
+            @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken,
+            @PathVariable String roomId) {
+        String email = getUserEmail();
+        return messageRoomService.deleteRoom(roomId, email);
+    }
+
+    private static String getUserEmail() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserDetailsImpl userDetails = (UserDetailsImpl) principal;
+        return userDetails.getUsername();
     }
 }

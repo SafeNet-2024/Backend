@@ -1,4 +1,4 @@
-package com.SafeNet.Backend.domain.post.api;
+package com.SafeNet.Backend.domain.post.controller;
 
 import com.SafeNet.Backend.domain.post.dto.PostResponseDto;
 import com.SafeNet.Backend.domain.post.entity.Category;

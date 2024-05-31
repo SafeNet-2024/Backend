@@ -1,4 +1,4 @@
-package com.SafeNet.Backend.domain.message.api;
+package com.SafeNet.Backend.domain.message.controller;
 
 import com.SafeNet.Backend.domain.message.dto.MessageDto;
 import com.SafeNet.Backend.domain.message.service.MessageService;

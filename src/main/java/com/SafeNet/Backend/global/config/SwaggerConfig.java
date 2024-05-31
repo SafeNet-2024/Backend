@@ -1,6 +1,7 @@
 package com.SafeNet.Backend.global.config;
 
 
+import com.google.common.net.HttpHeaders;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.models.Components;
@@ -27,14 +28,29 @@ public class SwaggerConfig {
     }
     @Bean
     public OpenAPI openAPI() {
-        String jwt = "JWT";
-        SecurityRequirement securityRequirement = new SecurityRequirement().addList(jwt);
-        Components components = new Components().addSecuritySchemes(jwt, new SecurityScheme()
-                .name(jwt)
-                .type(SecurityScheme.Type.HTTP)
-                .scheme("bearer")
-                .bearerFormat("JWT")
-        );
+        String key = "ACCESS_TOKEN";
+        String refreshKey = "REFRESH_TOKEN";
+
+        SecurityRequirement securityRequirement = new SecurityRequirement()
+                .addList(key)
+                .addList(refreshKey);
+
+        SecurityScheme accessTokenSecurityScheme = new SecurityScheme()
+                .type(SecurityScheme.Type.APIKEY)         // HTTP 인증 방식을 지정
+                .scheme("bearer")                       // Bearer 토큰 방식을 지정
+                .bearerFormat("JWT")                    // JWT 형식을 지정
+                .in(SecurityScheme.In.HEADER)           // HTTP 헤더에 포함됨을 지정
+                .name(key);
+
+        SecurityScheme refreshTokenSecurityScheme = new SecurityScheme()
+                .type(SecurityScheme.Type.APIKEY)         // HTTP 인증 방식을 지정
+                .in(SecurityScheme.In.HEADER)           // HTTP 헤더에 포함됨을 지정
+                .name(refreshKey);
+
+        Components components = new Components()
+                .addSecuritySchemes(key, accessTokenSecurityScheme)
+                .addSecuritySchemes(refreshKey, refreshTokenSecurityScheme);
+
         return new OpenAPI()
                 .components(new Components())
                 .addSecurityItem(securityRequirement)

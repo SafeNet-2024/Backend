@@ -4,8 +4,8 @@ import com.SafeNet.Backend.domain.post.dto.PostRequestDto;
 import com.SafeNet.Backend.domain.postLike.entity.PostLike;
 import com.SafeNet.Backend.domain.member.entity.Member;
 import com.SafeNet.Backend.domain.messageroom.entity.MessageRoom;
-import com.SafeNet.Backend.domain.region.entity.Region;
 import com.SafeNet.Backend.domain.file.entity.File;
+import com.SafeNet.Backend.domain.region.entity.Region;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -78,7 +78,8 @@ public class Post {
     private Member member;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "region_id", nullable = false)
+    @JoinColumn(name = "region_id")
+    //@NotNull
     private Region region;
 
     @OneToOne(fetch = LAZY, mappedBy = "post", cascade = CascadeType.ALL)
