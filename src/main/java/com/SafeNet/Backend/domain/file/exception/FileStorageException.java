@@ -1,7 +1,5 @@
 package com.SafeNet.Backend.domain.file.exception;
 
-import java.io.IOException;
-
 public class FileStorageException extends RuntimeException {
     public FileStorageException(String message) {
         super(message);

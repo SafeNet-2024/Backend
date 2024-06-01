@@ -10,11 +10,13 @@ import com.SafeNet.Backend.domain.messageroom.entity.MessageRoom;
 import com.SafeNet.Backend.domain.messageroom.dto.MessageRoomDto;
 import com.SafeNet.Backend.domain.messageroom.repository.MessageRoomRepository;
 import com.SafeNet.Backend.domain.post.entity.Post;
+import com.SafeNet.Backend.domain.post.exception.PostException;
 import com.SafeNet.Backend.domain.post.repository.PostRepository;
+import com.SafeNet.Backend.global.exception.CustomException;
 import com.SafeNet.Backend.global.pubsub.RedisSubscriber;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
@@ -26,76 +28,85 @@ import java.util.*;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class MessageRoomService {
     private final MessageRoomRepository messageRoomRepository;
     private final MessageRepository messageRepository;
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
-
-    // 쪽지방(topic)에 발행되는 메시지를 처리하는 리스너
     private final RedisMessageListenerContainer redisMessageListener;
-
-    // 구독 처리 서비스
     private final RedisSubscriber redisSubscriber;
+    private final RedisTemplate<String, Object> redisTemplate;
 
-    private static final String Message_Rooms = "MESSAGE_ROOM"; // Redis에 채팅방 데이터를 저장하기 위한 해시맵의 키(채팅방 데이터를 Redis에서 조회 및 저장)
-
-    private final RedisTemplate<String, Object> redisTemplate; // Redis와 상호 작용하기 위한 RedisTemplate
-    private HashOperations<String, String, MessageRoomDto> opsHashMessageRoom; // RedisTemplate을 사용하여 Redis 해시(Hash) 데이터 구조에 접근하기 위한 HashOperations
-
-    // 채팅방의 대화 메시지 발행을 위한 redis topic(채팅방) 정보
-    // 서버별로 쪽지방에 매치되는 topic 정보를 Map에 넣고, 이는 roomId로 찾는다.
+    private HashOperations<String, String, MessageRoomDto> opsHashMessageRoom;
     private Map<String, ChannelTopic> topics;
+
+    private static final String Message_Rooms = "MESSAGE_ROOM"; // Redis에 채팅방 데이터를 저장하기 위한 해시맵의 키
+
+    public MessageRoomService(
+            MessageRoomRepository messageRoomRepository,
+            MessageRepository messageRepository,
+            PostRepository postRepository,
+            MemberRepository memberRepository,
+            RedisMessageListenerContainer redisMessageListener,
+            RedisSubscriber redisSubscriber,
+            @Qualifier("redisTemplate") RedisTemplate<String, Object> redisTemplate) {
+        this.messageRoomRepository = messageRoomRepository;
+        this.messageRepository = messageRepository;
+        this.postRepository = postRepository;
+        this.memberRepository = memberRepository;
+        this.redisMessageListener = redisMessageListener;
+        this.redisSubscriber = redisSubscriber;
+        this.redisTemplate = redisTemplate;
+    }
 
     @PostConstruct
     private void init() {
         opsHashMessageRoom = redisTemplate.opsForHash();
-        topics = new HashMap<>(); // HashMap 객체를 초기화하여 topics 필드를 초기화
+        topics = new HashMap<>();
     }
 
     // 1:1 채팅방 생성
-    public MessageResponseDto createRoom(MessageRequestDto messageRequestDto, Member member) {
-        Post post = postRepository.findById(messageRequestDto.getPostId()).orElseThrow(
-                () -> new IllegalArgumentException("게시글을 찾을 수 없습니다.")
-        );
+    public MessageResponseDto createRoom(MessageRequestDto messageRequestDto, String email) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new PostException("Member not found with email: " + email, HttpStatus.NOT_FOUND));
+
+        Post post = postRepository.findById(messageRequestDto.getPostId()).orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
         // sender와 receiver가 속해있는 채팅방 조회
-        MessageRoom messageRoom = messageRoomRepository.findBySenderAndReceiver(member.getName(), messageRequestDto.getReceiver());
+        Optional<MessageRoom> messageRoom = messageRoomRepository.findBySenderAndReceiverAndPostId(member.getName(), messageRequestDto.getReceiver(), messageRequestDto.getPostId());
+        try {
+            // 처음 쪽지방 생성한 경우와 해당 게시물에 이미 생성된 쪽지방이 아닌 경우
+            // 한 게시글에 하나의 채팅방만 생성되도록 구현
+            if (messageRoom.isEmpty()) {
+                MessageRoomDto messageRoomDto = MessageRoomDto.createMessageRoom(messageRequestDto, member);
+                // redis 저장
+                opsHashMessageRoom.put(Message_Rooms, messageRoomDto.getRoomId(), messageRoomDto);
+                // db 저장
+                MessageRoom newRoom = MessageRoom.builder()
+                        .id(messageRoomDto.getId())
+                        .roomName(messageRoomDto.getRoomName())
+                        .roomId(messageRoomDto.getRoomId())
+                        .sender(messageRoomDto.getSender())
+                        .receiver(messageRoomDto.getReceiver())
+                        .member(member)
+                        .post(post)
+                        .build();
+                MessageRoom new_messageRoom = messageRoomRepository.save(newRoom);
 
-        // 처음 쪽지방 생성한 경우와 해당 게시물에 이미 생성된 쪽지방이 아닌 경우
-        // 한 게시글에 하나의 채팅방만 생성되도록 구현
-        if (messageRoom == null ||
-                !member.getName().equals(messageRoom.getSender()) &&
-                        !messageRequestDto.getReceiver().equals(messageRoom.getReceiver()) &&
-                        !messageRequestDto.getPostId().equals(post.getId())) {
+                return MessageResponseDto.builder()
+                        .id(new_messageRoom.getId())
+                        .roomName(new_messageRoom.getRoomName())
+                        .sender(new_messageRoom.getSender())
+                        .roomId(new_messageRoom.getRoomId())
+                        .receiver(new_messageRoom.getReceiver())
+                        .postId(messageRoomDto.getPostId()).build();
 
-            MessageRoomDto messageRoomDto = MessageRoomDto.createMessageRoom(messageRequestDto, member);
-            // redis 저장
-            opsHashMessageRoom.put(Message_Rooms, messageRoomDto.getRoomId(), messageRoomDto);
-            // db 저장
-            MessageRoom newRoom = MessageRoom.builder()
-                    .id(messageRoomDto.getId())
-                    .roomName(messageRoomDto.getRoomName())
-                    .roomId(messageRoomDto.getRoomId())
-                    .sender(messageRoomDto.getSender())
-                    .receiver(messageRoomDto.getReceiver())
-                    .member(member)
-                    .post(post)
-                    .build();
-            messageRoom = messageRoomRepository.save(newRoom);
-
-            return MessageResponseDto.builder()
-                    .id(messageRoom.getId())
-                    .roomName(messageRoom.getRoomName())
-                    .sender(messageRoom.getSender())
-                    .roomId(messageRoom.getRoomId())
-                    .receiver(messageRoom.getReceiver())
-                    .postId(messageRoomDto.getPostId()).build();
-
-        } else { // 이미 생성된 채팅방인 경우 중복 생성되지 않게 해당 채팅방으로 이동
-            return MessageResponseDto.builder()
-                    .roomId(messageRoom.getRoomId()).build();
+            } else { // 이미 생성된 채팅방인 경우 중복 생성되지 않게 해당 채팅방으로 이동
+                MessageRoom existingRoom = messageRoom.get();
+                return MessageResponseDto.builder()
+                        .roomId(existingRoom.getRoomId()).build();
+            }
+        } catch (Exception ex) {
+            throw new CustomException("채팅방을 생성하던 도중: " + ex.getMessage());
         }
     }
 
@@ -106,7 +117,8 @@ public class MessageRoomService {
      * user가 sender인 경우 해당 채팅방의 이름이 receiver이고
      * user가 receiver인 경우 해당 채팅방의 이름이 sender이다.
      */
-    public List<MessageResponseDto> findAllRoomByUser(Member member) {
+    public List<MessageResponseDto> findAllRoomByUser(String email) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new PostException("Member not found with email: " + email, HttpStatus.NOT_FOUND));
         List<MessageRoom> messageRooms = messageRoomRepository.findByMemberOrReceiver(member, member.getName());
         List<MessageResponseDto> messageRoomDtos = new ArrayList<>();
 
@@ -157,7 +169,9 @@ public class MessageRoomService {
      * 사용자 관련 쪽지방 선택 조회
      * sender와 receiver만 해당 쪽지방을 조회할 수 있다.
      */
-    public MessageRoomDto findRoom(String roomId, Member member) {
+    public MessageRoomDto findRoom(String roomId, String email) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new PostException("Member not found with email: " + email, HttpStatus.NOT_FOUND));
+
         MessageRoom messageRoom = messageRoomRepository.findByRoomId(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 쪽지방이 존재하지 않습니다."));
 
@@ -188,7 +202,8 @@ public class MessageRoomService {
      * sender나 receiver가 삭제할 경우 sender나 receiver가 "Not_Exist_Receiver(Sender)"로 변경됨
      * member는 더이상 해당 채팅방을 조회하지 못함.
      */
-    public MessageResponseDto deleteRoom(String roomId, Member member) {
+    public MessageResponseDto deleteRoom(String roomId, String email) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new PostException("Member not found with email: " + email, HttpStatus.NOT_FOUND));
         MessageRoom messageRoom = messageRoomRepository.findByRoomIdAndMemberOrRoomIdAndReceiver(roomId, member, roomId, member.getName());
         boolean deleteFromDb = false;
         String updatedSender = messageRoom.getSender();
@@ -196,6 +211,7 @@ public class MessageRoomService {
 
         // sender가 삭제하는 경우
         if (member.getName().equals(messageRoom.getSender())) {
+            log.info("messageRoom.getSender()" + messageRoom.getSender());
             updatedSender = "Not_Exist_Sender";
             deleteFromDb = "Not_Exist_Receiver".equals(messageRoom.getReceiver()); // receiver도 이미 삭제했는지 확인
         }
