@@ -41,7 +41,7 @@ public class RedisConfig {
     /**
      * Redis와 상호작용하기 위해 어플리케이션에서 사용할 redisTemplate설정
      */
-    @Bean
+    @Bean(name = "redisTemplate")
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(connectionFactory);
@@ -53,7 +53,7 @@ public class RedisConfig {
     /**
      * Redis에 메시지 내역을 저장하기 위한 template설정
      */
-    @Bean
+    @Bean(name = "redisTemplateMessage")
     public RedisTemplate<String, MessageDto> redisTemplateMessage(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, MessageDto> redisTemplateMessage = new RedisTemplate<>();
         redisTemplateMessage.setConnectionFactory(connectionFactory);
@@ -73,6 +73,5 @@ public class RedisConfig {
         tokenRedisTemplate.setValueSerializer(new StringRedisSerializer());
         return tokenRedisTemplate;
     }
-
 }
 

@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.data.redis.RedisConnectionFailureException;
@@ -22,11 +23,15 @@ import java.io.IOException;
  * Request 이전에 작동
  */
 @Slf4j
-@RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
-    private final JwtTokenProvider jwtTokenProvider;
-    private final RedisTemplate redisTemplate;
 
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RedisTemplate<String, String> redisTemplate;
+
+    public JwtFilter(JwtTokenProvider jwtTokenProvider, @Qualifier("tokenRedisTemplate") RedisTemplate<String, String> redisTemplate) {
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.redisTemplate = redisTemplate;
+    }
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,

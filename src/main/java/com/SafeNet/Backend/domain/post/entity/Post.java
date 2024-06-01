@@ -82,8 +82,8 @@ public class Post {
     //@NotNull
     private Region region;
 
-    @OneToOne(fetch = LAZY, mappedBy = "post", cascade = CascadeType.ALL)
-    private MessageRoom messageRoom;
+    @OneToMany(fetch = LAZY, mappedBy = "post", cascade = CascadeType.ALL)
+    private List<MessageRoom> messageRoom;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
@@ -106,5 +106,9 @@ public class Post {
                 .contents(dto.getContents())
                 .fileList(fileList)
                 .build();
+    }
+
+    public void setPostStatus(PostStatus postStatus) {
+        this.postStatus = postStatus;
     }
 }

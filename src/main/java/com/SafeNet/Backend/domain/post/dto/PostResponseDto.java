@@ -12,7 +12,8 @@ public class PostResponseDto {
     private Long postId;
     private Category category;
     private int likeCount;
-    private String imageUrl;
+    private String productImageUrl; // 상품 이미지 URL
+    private String receiptImageUrl; // 영수증 이미지 URL
     private String title;
     private int count;
     private String buyDate; // LocalDate 대신 String으로 받음
