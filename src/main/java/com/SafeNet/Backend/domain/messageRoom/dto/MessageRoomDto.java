@@ -23,12 +23,12 @@ public class MessageRoomDto implements Serializable {
     private String receiver;
     private Long postId;
 
-    public static MessageRoomDto createMessageRoom(MessageRequestDto messageRequestDto, Member member) {
+    public static MessageRoomDto createMessageRoom(Long postId, Member sender, String receiver) {
         return MessageRoomDto.builder()
-                .roomName(messageRequestDto.getReceiver())  // roomName을 receiver의 이름으로 설정
+                .roomName(receiver)  // roomName을 receiver의 이름으로 설정
                 .roomId(UUID.randomUUID().toString())
-                .sender(member.getName())
-                .receiver(messageRequestDto.getReceiver())
+                .sender(sender.getName())
+                .receiver(receiver)
                 .build();
     }
 }

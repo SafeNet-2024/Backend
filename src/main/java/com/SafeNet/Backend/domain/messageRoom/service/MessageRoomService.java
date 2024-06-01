@@ -66,18 +66,19 @@ public class MessageRoomService {
     }
 
     // 1:1 채팅방 생성
-    public MessageResponseDto createRoom(MessageRequestDto messageRequestDto, String email) {
+    public MessageResponseDto createRoom(Long postId, String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(() -> new PostException("Member not found with email: " + email, HttpStatus.NOT_FOUND));
+        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
-        Post post = postRepository.findById(messageRequestDto.getPostId()).orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+        String receiver = post.getMember().getName(); // 게시물의 작성자를 receiver로 설정
 
         // sender와 receiver가 속해있는 채팅방 조회
-        Optional<MessageRoom> messageRoom = messageRoomRepository.findBySenderAndReceiverAndPostId(member.getName(), messageRequestDto.getReceiver(), messageRequestDto.getPostId());
+        Optional<MessageRoom> messageRoom = messageRoomRepository.findBySenderAndReceiverAndPostId(member.getName(), receiver, postId);
         try {
             // 처음 쪽지방 생성한 경우와 해당 게시물에 이미 생성된 쪽지방이 아닌 경우
             // 한 게시글에 하나의 채팅방만 생성되도록 구현
             if (messageRoom.isEmpty()) {
-                MessageRoomDto messageRoomDto = MessageRoomDto.createMessageRoom(messageRequestDto, member);
+                MessageRoomDto messageRoomDto = MessageRoomDto.createMessageRoom(postId, member, receiver);
                 // redis 저장
                 opsHashMessageRoom.put(Message_Rooms, messageRoomDto.getRoomId(), messageRoomDto);
                 // db 저장
