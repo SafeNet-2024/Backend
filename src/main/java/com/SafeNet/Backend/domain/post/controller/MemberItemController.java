@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/mypage")
+@RequestMapping("/api/v2/mypage")
 @RequiredArgsConstructor
 @Tag(name = "Member Item", description = "사용자가 찜한 게시글, 등록한 게시글 조회 API")
 public class MemberItemController {
