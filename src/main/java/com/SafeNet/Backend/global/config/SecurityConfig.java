@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -56,6 +57,9 @@ public class SecurityConfig {
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))  // 인증 실패시 HTTP 401 반환
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()  // 특정 경로에 대한 접근 허용
+                        .requestMatchers(HttpMethod.GET, "/api/v2/posts", "/api/v2/posts/{postId}",
+                                "/api/v1/posts/keyword", "/api/v1/posts/category",
+                                "/api/v1/posts/sort/created", "/api/v1/posts/sort/buyDate").permitAll()  // GET 요청 허용
                         .anyRequest().authenticated())  // 나머지 요청은 인증 필요
                 //.formLogin(form -> form
                 //       .loginPage("/login").permitAll())  // 로그인 페이지 설정
