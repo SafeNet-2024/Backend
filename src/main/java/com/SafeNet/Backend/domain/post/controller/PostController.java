@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/v2/posts")
+@RequestMapping("/api/v3/posts")
 @RequiredArgsConstructor
 @Tag(name = "Post", description = "게시물 CRUD API")
 public class PostController {
@@ -53,8 +53,12 @@ public class PostController {
 
     @GetMapping
     @Operation(summary = "전체 게시물 불러오기", description = "전체 게시물 리스트 볼 때 사용하는 API")
-    public ResponseEntity<?> getAllPosts() {
-        List<PostResponseDto> allPosts = postService.getAllPosts();
+    public ResponseEntity<?> getAllPosts(
+            @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
+            @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken
+    ) {
+        String email = getUserEmail();
+        List<PostResponseDto> allPosts = postService.getAllPosts(email);
         if (allPosts.isEmpty()) {
             return ResponseEntity.ok("등록된 게시물이 없습니다.");
         }
@@ -63,7 +67,8 @@ public class PostController {
 
     @GetMapping("/{postId}")
     @Operation(summary = "특정 게시물 불러오기", description = "특정 게시물 상세보기 할 때 사용하는 API")
-    public ResponseEntity<?> getPostById(@PathVariable("postId") Long id) {
+    public ResponseEntity<?> getPostById(
+            @PathVariable("postId") Long id) {
         Optional<PostResponseDto> postById = postService.getPostById(id);
         if (postById.isPresent()) {
             return ResponseEntity.ok(postById.get());

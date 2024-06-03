@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.lang.Boolean.FALSE;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -27,8 +29,12 @@ public class MemberItemService {
     public List<PostResponseDto> getPostsByMemberId(String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(() -> new PostException("Member not found", HttpStatus.NOT_FOUND));
         try {
+            Long memberId = member.getId();
             List<Post> posts = postRepository.findByMember_Id(member.getId());
-            return posts.stream().map(this::convertToDto).collect(Collectors.toList());
+            return posts.stream().map(post -> {
+                boolean isLikedByCurrentUser = postLikeRepository.existsByPostIdAndMemberId(post.getId(), memberId);
+                return convertToDto(post, isLikedByCurrentUser);
+            }).collect(Collectors.toList());
         } catch (Exception e) {
             throw new PostException("Failed to retrieve posts by memberId", HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -38,17 +44,17 @@ public class MemberItemService {
         Member member = memberRepository.findByEmail(email).orElseThrow(() -> new PostException("Member not found", HttpStatus.NOT_FOUND));
         try {
             List<PostLike> postLikes = postLikeRepository.findByMember_Id(member.getId());
-            return postLikes.stream().map(postLike -> this.convertToDto(postLike.getPost())).collect(Collectors.toList());
+            return postLikes.stream().map(postLike -> this.convertToDto(postLike.getPost(), FALSE)).collect(Collectors.toList());
         } catch (Exception e) {
             throw new PostException("Failed to retrieve liked posts by memberId", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    private PostResponseDto convertToDto(Post post) {
+    private PostResponseDto convertToDto(Post post, boolean isLikedByCurrentUser) {
         return PostResponseDto.builder()
                 .postId(post.getId())
                 .title(post.getTitle())
-                .likeCount(post.getPostLikeList().size())
+                .likeCount(isLikedByCurrentUser)
                 .productImageUrl(post.getFileList().isEmpty() ? null : post.getFileList().get(1).getFileUrl())
                 .count(post.getCount())
                 .cost(post.getCost())

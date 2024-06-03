@@ -20,8 +20,9 @@ public class MemberItemController {
     private final MemberItemService memberItemService;
 
     @GetMapping("/my-posts")
-    public ResponseEntity<?> getPostsByMemberId(@RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
-                                                @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken) {
+    public ResponseEntity<?> getPostsByMemberId(
+            @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
+            @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken) {
         String email = getUserEmail();
 
         List<PostResponseDto> posts = memberItemService.getPostsByMemberId(email);
@@ -32,8 +33,9 @@ public class MemberItemController {
     }
 
     @GetMapping("/liked-posts")
-    public ResponseEntity<?> getLikedPostsByMemberId(@RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
-                                                     @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken) {
+    public ResponseEntity<?> getLikedPostsByMemberId(
+            @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
+            @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken) {
         String email = getUserEmail();
 
         List<PostResponseDto> likedPosts = memberItemService.getLikedPostsByMemberId(email);
