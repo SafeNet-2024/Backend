@@ -12,6 +12,7 @@ import com.SafeNet.Backend.domain.post.dto.PostRequestDto;
 import com.SafeNet.Backend.domain.post.dto.PostResponseDto;
 import com.SafeNet.Backend.domain.post.exception.PostException;
 import com.SafeNet.Backend.domain.post.repository.PostRepository;
+import com.SafeNet.Backend.domain.postLike.repository.PostLikeRepository;
 import com.SafeNet.Backend.domain.region.entity.Region;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -33,6 +34,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final FileStorageService fileStorageService;
     private final MemberRepository memberRepository;
+    private final PostLikeRepository postLikeRepository;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일");
     private final S3Service s3Service;
 
@@ -74,10 +76,15 @@ public class PostService {
         }
     }
 
-    public List<PostResponseDto> getAllPosts() {
+    public List<PostResponseDto> getAllPosts(String email) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new PostException("Member not found with email: " + email, HttpStatus.NOT_FOUND));
         try {
+            Long memberId = member.getId();
             List<Post> posts = postRepository.findAll();
-            return posts.stream().map(this::convertToDto).collect(Collectors.toList());
+            return posts.stream().map(post -> {
+                boolean isLikedByCurrentUser = postLikeRepository.existsByPostIdAndMemberId(post.getId(), memberId);
+                return convertToDto(post, isLikedByCurrentUser);
+            }).collect(Collectors.toList());
         } catch (Exception e) {
             throw new PostException("Failed to retrieve posts", HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -95,7 +102,6 @@ public class PostService {
                         .count(post.getCount())
                         .buyDate(post.getBuyDate().toString())
                         .category(post.getCategory())
-                        .likeCount(post.getPostLikeList().size())
                         .build())
                 .orElseThrow(() -> new PostException("Post not found with id: " + id, HttpStatus.NOT_FOUND)));
     }
@@ -186,11 +192,11 @@ public class PostService {
         postRepository.save(post);
     }
 
-    private PostResponseDto convertToDto(Post post) {
+    private PostResponseDto convertToDto(Post post, boolean isLikedByCurrentUser) {
         return PostResponseDto.builder()
                 .postId(post.getId())
                 .title(post.getTitle())
-                .likeCount(post.getPostLikeList().size())
+                .likeCount(isLikedByCurrentUser)
                 .productImageUrl(post.getFileList().isEmpty() ? null : post.getFileList().get(1).getFileUrl())
                 .count(post.getCount())
                 .cost(post.getCost())

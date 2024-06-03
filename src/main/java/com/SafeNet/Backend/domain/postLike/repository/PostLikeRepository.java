@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
     List<PostLike> findByMember_Id(Long memberId);
     Optional<PostLike> findByPostIdAndMemberId(Long postId, Long memberId);
+    boolean existsByPostIdAndMemberId(Long postId, Long memberId); // 좋아요가 눌려있는지 확인
 }
