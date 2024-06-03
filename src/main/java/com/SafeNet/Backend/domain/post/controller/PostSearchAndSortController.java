@@ -59,14 +59,15 @@ public class PostSearchAndSortController {
         List<PostResponseDto> posts = postSearchAndSortService.sortByBuyDate(email);
         return ResponseEntity.ok(posts);
     }
+
     @ExceptionHandler(PostException.class)
     public ResponseEntity<String> handleCustomException(PostException e) {
         return ResponseEntity.status(e.getStatus()).body(e.getMessage());
     }
+
     private static String getUserEmail() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserDetailsImpl userDetails = (UserDetailsImpl) principal;
         return userDetails.getUsername();
     }
 }
-
