@@ -4,8 +4,8 @@ import com.SafeNet.Backend.domain.member.entity.UserDetailsImpl;
 import com.SafeNet.Backend.domain.post.dto.PostRequestDto;
 import com.SafeNet.Backend.domain.post.dto.PostResponseDto;
 import com.SafeNet.Backend.domain.post.exception.PostException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.SafeNet.Backend.domain.post.service.PostService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -43,18 +43,19 @@ public class PostController {
             @RequestPart(value = "receiptImage") MultipartFile receiptImage,
             @RequestPart(value = "productImage") MultipartFile productImage) throws JsonProcessingException {
         PostRequestDto postRequestDto = objectMapper.readValue(postRequestDtoJson, PostRequestDto.class); // JSON 객체를 PostRequestDto로 변환
-
         String email = getUserEmail();
-
         postService.createPost(postRequestDto, receiptImage, productImage, email);
         return ResponseEntity.status(HttpStatus.CREATED).body("Post created successfully");
     }
 
-
     @GetMapping
-    @Operation(summary = "전체 게시물 불러오기", description = "전체 게시물 리스트 볼 때 사용하는 API")
-    public ResponseEntity<?> getAllPosts() {
-        List<PostResponseDto> allPosts = postService.getAllPosts();
+    @Operation(summary = "게시물 리스트 불러오기", description = "전체 게시물을 리스트로 볼 때 사용하는 API")
+    public ResponseEntity<?> getPosts(
+            @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
+            @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken
+    ) {
+        String email = getUserEmail();
+        List<PostResponseDto> allPosts = postService.getAllPosts(email);
         if (allPosts.isEmpty()) {
             return ResponseEntity.ok("등록된 게시물이 없습니다.");
         }
@@ -63,7 +64,10 @@ public class PostController {
 
     @GetMapping("/{postId}")
     @Operation(summary = "특정 게시물 불러오기", description = "특정 게시물 상세보기 할 때 사용하는 API")
-    public ResponseEntity<?> getPostById(@PathVariable("postId") Long id) {
+    public ResponseEntity<?> getPostById(
+            @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
+            @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken,
+            @PathVariable("postId") Long id) {
         Optional<PostResponseDto> postById = postService.getPostById(id);
         if (postById.isPresent()) {
             return ResponseEntity.ok(postById.get());
@@ -83,7 +87,6 @@ public class PostController {
             @RequestPart(value = "productImage", required = false) MultipartFile productImage) throws JsonProcessingException {
         PostRequestDto postRequestDto = new ObjectMapper().readValue(postRequestDtoJson, PostRequestDto.class);
         String email = getUserEmail();
-
         postService.updatePost(id, postRequestDto, receiptImage, productImage, email);
         return ResponseEntity.ok("Post updated successfully");
     }
