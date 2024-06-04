@@ -28,6 +28,11 @@ public class CommonPostService {
     public Member getMemberByEmail(String email) {
         return memberRepository.findByEmail(email).orElseThrow(() -> new PostException("Member not found with email: " + email, HttpStatus.NOT_FOUND));
     }
+    private Long getMemberRegionId(String email) {
+        Member member = getMemberByEmail(email);
+        Region region = member.getRegion();
+        return region.getId();
+    }
 
     public List<PostResponseDto> convertPostsToDto(List<Post> posts, Long memberId) {
         return posts.stream().map(post -> {
@@ -66,25 +71,33 @@ public class CommonPostService {
 
     // 키워드로 게시물 조회
     public List<PostResponseDto> searchPostsByKeyword(String keyword, String email) {
-        List<Post> posts = postRepository.findByTitleContainingOrContentsContaining(keyword, keyword);
+        int MAX_LENGTH = 50;
+        if (keyword.length() > MAX_LENGTH) { // 입력한 keyword가 50글자보다 길다면
+            throw new PostException("검색어가 너무 깁니다. " + MAX_LENGTH + " 글자 이하로 입력해주세요.", HttpStatus.BAD_REQUEST);
+        }
+        Long memberRegionId = getMemberRegionId(email);
+        List<Post> posts = postRepository.findByRegion_IdAndTitleContainingOrContentsContaining(memberRegionId, keyword, keyword);
         return getPostResponseDtos(email, posts);
     }
 
     // 카테고리로 게시물 조회
     public List<PostResponseDto> searchPostsByCategory(Category category, String email) {
-        List<Post> posts = postRepository.findByCategory(category);
+        Long memberRegionId = getMemberRegionId(email);
+        List<Post> posts = postRepository.findByRegion_IdAndCategory(memberRegionId, category);
         return getPostResponseDtos(email, posts);
     }
 
     // 게시물 생성 일자 역순으로 게시물 조회
     public List<PostResponseDto> sortPostsByCreated(String email) {
-        List<Post> posts = postRepository.findAllByOrderByCreatedDesc();
+        Long memberRegionId = getMemberRegionId(email);
+        List<Post> posts = postRepository.findByRegion_IdOrderByCreatedDesc(memberRegionId);
         return getPostResponseDtos(email, posts);
     }
 
     // 구매일자 역순으로 게시물 조회
     public List<PostResponseDto> sortPostsByBuyDate(String email) {
-        List<Post> posts = postRepository.findAllByOrderByBuyDateDesc();
+        Long memberRegionId = getMemberRegionId(email);
+        List<Post> posts = postRepository.findByRegion_IdOrderByBuyDateDesc(memberRegionId);
         return getPostResponseDtos(email, posts);
     }
 

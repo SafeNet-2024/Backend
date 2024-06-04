@@ -14,14 +14,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/posts")
+@RequestMapping("/api/v3/posts")
 @RequiredArgsConstructor
 @Tag(name = "Post Query", description = "게시글 특정 조건 조회 및 정렬 API")
 public class PostSearchAndSortController {
     private final PostSearchAndSortService postSearchAndSortService;
 
     @GetMapping("/keyword")
-    public ResponseEntity<List<PostResponseDto>> searchByKeyWord(
+    public ResponseEntity<List<PostResponseDto>> searchByKeyWord( // v3: 사용자와 사용자의 지역 정보 추가
             @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
             @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken,
             @RequestParam("keyword") String keyword) {
@@ -31,7 +31,7 @@ public class PostSearchAndSortController {
     }
 
     @GetMapping("/category")
-    public ResponseEntity<List<PostResponseDto>> searchByCategory(
+    public ResponseEntity<List<PostResponseDto>> searchByCategory( // v3: 사용자와 사용자의 지역 정보 추가
             @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
             @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken,
             @RequestParam("category") Category category) {
@@ -41,7 +41,7 @@ public class PostSearchAndSortController {
     }
 
     @GetMapping("/sort/created")
-    public ResponseEntity<List<PostResponseDto>> sortByCreated(
+    public ResponseEntity<List<PostResponseDto>> sortByCreated( // v3: 사용자와 사용자의 지역 정보 추가
             @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
             @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken
     ) {
@@ -51,7 +51,7 @@ public class PostSearchAndSortController {
     }
 
     @GetMapping("/sort/buyDate")
-    public ResponseEntity<List<PostResponseDto>> sortByBuyDate(
+    public ResponseEntity<List<PostResponseDto>> sortByBuyDate( // v3: 사용자와 사용자의 지역 정보 추가
             @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
             @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken
     ) {
