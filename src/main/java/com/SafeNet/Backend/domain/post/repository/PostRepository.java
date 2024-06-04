@@ -11,12 +11,14 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByMember_Id(Long memberId);
 
-    List<Post> findByTitleContainingOrContentsContaining(String title, String contents);
+    List<Post> findByRegion_IdAndCategory(Long memberRegionId, Category category);
 
-    List<Post> findByCategory(Category category);
+    List<Post> findByRegion_IdOrderByCreatedDesc(Long memberRegionId);
 
-    List<Post> findAllByOrderByCreatedDesc();
+    List<Post> findByRegion_IdOrderByBuyDateDesc(Long memberRegionId);
 
-    List<Post> findAllByOrderByBuyDateDesc();
+    List<Post> findByRegion_Id(Long regionId);
+    List<Post> findByRegion_IdAndTitleContainingOrContentsContaining(Long regionId, String title, String contents);
+
 }
 
