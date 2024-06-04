@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/v2/posts")
+@RequestMapping("/api/v3/posts")
 @RequiredArgsConstructor
 @Tag(name = "Post", description = "게시물 CRUD API")
 public class PostController {
@@ -36,7 +36,7 @@ public class PostController {
             @ApiResponse(responseCode = "201", description = "게시물이 성공적으로 생성되었습니다"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다")
     })
-    public ResponseEntity<String> createPost(
+    public ResponseEntity<String> createPost( // v3: 사용자와 사용자의 지역 정보 추가
             @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
             @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken,
             @RequestPart(value = "post") String postRequestDtoJson,
@@ -50,7 +50,7 @@ public class PostController {
 
     @GetMapping
     @Operation(summary = "게시물 리스트 불러오기", description = "전체 게시물을 리스트로 볼 때 사용하는 API")
-    public ResponseEntity<?> getPosts(
+    public ResponseEntity<?> getPosts( // v3: 사용자와 사용자의 지역 정보 추가
             @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
             @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken
     ) {
@@ -67,8 +67,8 @@ public class PostController {
     public ResponseEntity<?> getPostById(
             @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
             @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken,
-            @PathVariable("postId") Long id) {
-        Optional<PostResponseDto> postById = postService.getPostById(id);
+            @PathVariable("postId") Long postId) {
+        Optional<PostResponseDto> postById = postService.getPostById(postId);
         if (postById.isPresent()) {
             return ResponseEntity.ok(postById.get());
         } else {
@@ -108,7 +108,8 @@ public class PostController {
             @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
             @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken,
             @PathVariable("postId") Long id) {
-        postService.updatePostStatusToTrading(id);
+        String email = getUserEmail();
+        postService.updatePostStatusToTrading(id, email);
         return ResponseEntity.ok("Post status updated to trading");
     }
 
@@ -118,7 +119,8 @@ public class PostController {
             @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
             @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken,
             @PathVariable("postId") Long id) {
-        postService.updatePostStatusToCompleted(id);
+        String email = getUserEmail();
+        postService.updatePostStatusToCompleted(id, email);
         return ResponseEntity.ok("Post status updated to completed");
     }
 

@@ -10,6 +10,7 @@ import com.SafeNet.Backend.domain.post.repository.PostRepository;
 import com.SafeNet.Backend.domain.postLike.entity.PostLike;
 import com.SafeNet.Backend.domain.postLike.repository.PostLikeRepository;
 import com.SafeNet.Backend.domain.post.util.PostDtoConverter;
+import com.SafeNet.Backend.domain.region.entity.Region;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -37,8 +38,12 @@ public class CommonPostService {
 
     // 게시물 리스트 조회
     public List<PostResponseDto> getAllPosts(String email) {
-        List<Post> posts = postRepository.findAll();
-        return getPostResponseDtos(email, posts);
+        Member member = getMemberByEmail(email);
+        Long memberId = member.getId(); // MemberId 추출
+        Region region = member.getRegion();
+        Long memberRegionId = region.getId(); // 멤버의 RegionId 추출
+        List<Post> posts = postRepository.findByRegion_Id(memberRegionId);
+        return convertPostsToDto(posts, memberId);
     }
 
     // 사용자가 등록한 게시물 조회

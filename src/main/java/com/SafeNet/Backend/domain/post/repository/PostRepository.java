@@ -18,5 +18,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findAllByOrderByCreatedDesc();
 
     List<Post> findAllByOrderByBuyDateDesc();
+
+    List<Post> findByRegion_Id(Long regionId);
 }
 
