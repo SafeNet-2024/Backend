@@ -21,16 +21,27 @@ public class S3Controller {
 
     @PostMapping(path = "/s3/test", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadFile(
-            @RequestPart(value = "receiptImage") MultipartFile receiptImage,
-            @RequestPart(value = "productImage") MultipartFile productImage
+            @RequestPart(value = "receiptImage") MultipartFile receiptImage
     ) throws IOException {
         String receipt_fileName = receiptImage.getOriginalFilename();
-        String product_fileName = productImage.getOriginalFilename();
-
         String receiptUrl = s3Service.upload("receiptImage", receipt_fileName, receiptImage);
-        String productUrl = s3Service.upload("productImage", product_fileName, productImage);
         log.info("receipt_url is : " + receiptUrl);
-        log.info("product_url is : " + productUrl);
-        return new ResponseEntity<>("Receipt URL: " + receiptUrl + "\nProduct URL: " + productUrl, HttpStatus.OK);
+        return new ResponseEntity<>("Receipt URL: " + receiptUrl, HttpStatus.OK);
+    }
+
+    @DeleteMapping(path = "/s3/test")
+    public ResponseEntity<String> deleteFile(
+            @RequestParam(value = "fileUrl") String fileUrl
+    ) {
+        try {
+            // S3Service를 사용하여 파일 삭제
+            s3Service.delete(fileUrl);
+            // 삭제 성공 메시지 반환
+            return ResponseEntity.ok("File deleted successfully");
+        } catch (Exception e) {
+            // 삭제 실패 시 예외 처리
+            log.error("Failed to delete file: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete file");
+        }
     }
 }
