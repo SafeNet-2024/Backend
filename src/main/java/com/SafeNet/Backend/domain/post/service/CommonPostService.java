@@ -76,7 +76,8 @@ public class CommonPostService {
             throw new PostException("검색어가 너무 깁니다. " + MAX_LENGTH + " 글자 이하로 입력해주세요.", HttpStatus.BAD_REQUEST);
         }
         Long memberRegionId = getMemberRegionId(email);
-        List<Post> posts = postRepository.findByRegion_IdAndTitleContainingOrContentsContaining(memberRegionId, keyword, keyword);
+        // 특정 지역의 정보이면서 제목을 포함한 경우 & 특정 지역의 정보이면서 내용을 포함한 경우
+        List<Post> posts = postRepository.findByRegionIdAndTitleOrContentsContaining(memberRegionId, keyword);
         return getPostResponseDtos(email, posts);
     }
 
