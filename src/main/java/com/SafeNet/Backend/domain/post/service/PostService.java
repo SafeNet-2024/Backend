@@ -40,7 +40,7 @@ public class PostService {
         Member member = commonPostService.getMemberByEmail(email);
         try {
             LocalDate parsedBuyDate = LocalDate.parse(postRequestDto.getBuyDate(), formatter);
-            Region region = member.getRegion();
+            Region region = member.getRegion(); // 로그인한 사용자의 지역 정보 추출
             String receiptImageUrl = s3Service.upload("receiptImage", receiptImage.getOriginalFilename(), receiptImage);
             String productImageUrl = s3Service.upload("productImage", productImage.getOriginalFilename(), productImage);
             File receiptFile = fileStorageService.saveFile(receiptImageUrl, FileType.receipt);
@@ -53,7 +53,7 @@ public class PostService {
                     .buyDate(parsedBuyDate)
                     .contents(postRequestDto.getContents())
                     .member(member)
-                    .region(region)
+                    .region(region) // 지역 정보 추가
                     .fileList(Arrays.asList(receiptFile, productFile))
                     .build();
             postRepository.save(post);
@@ -66,15 +66,33 @@ public class PostService {
         return commonPostService.getAllPosts(email);
     }
 
+    // 게시물 상세 조회
     public Optional<PostResponseDto> getPostById(Long id) {
-        return postRepository.findById(id).map(post -> PostDtoConverter.convertToDto(post, false));
+        return postRepository.findById(id).map(PostService::convertToDetailDto);
     }
+
+    private static PostResponseDto convertToDetailDto(Post post) {
+        return PostResponseDto.builder()
+                .postId(post.getId())
+                .category(post.getCategory())
+                .isLikedByCurrentUser(false)
+                .productImageUrl(post.getFileList().isEmpty() ? null : post.getFileList().get(1).getFileUrl())
+                .receiptImageUrl(post.getFileList().isEmpty() ? null : post.getFileList().get(0).getFileUrl())
+                .title(post.getTitle())
+                .count(post.getCount())
+                .buyDate(post.getBuyDate() != null ? post.getBuyDate().toString() : null)
+                .contents(post.getContents())
+                .writer(post.getMember().getName())
+                .cost(post.getCost())
+                .build();
+    }
+
 
     @Transactional
     public void updatePost(Long id, PostRequestDto postRequestDto, MultipartFile receiptImage, MultipartFile productImage, String email) {
         Post existingPost = postRepository.findById(id).orElseThrow(() -> new PostException("Post not found with id: " + id, HttpStatus.NOT_FOUND));
         if (!existingPost.getMember().getEmail().equals(email)) {
-            throw new PostException("You do not have permission to update this post", HttpStatus.FORBIDDEN);
+            throw new PostException("You do not have permission to update this post", HttpStatus.FORBIDDEN); // 글을 등록한 사람만 수정할 수 있는 권한이 있다.
         }
         try {
             if (existingPost.getPostStatus() != PostStatus.거래가능) {
@@ -82,14 +100,14 @@ public class PostService {
             }
             LocalDate parsedBuyDate = LocalDate.parse(postRequestDto.getBuyDate(), formatter);
             List<File> fileList = existingPost.getFileList();
-            if (receiptImage != null && !receiptImage.isEmpty()) {
+            if (receiptImage != null && !receiptImage.isEmpty()) { // receiptImage 파일이 비어있지 않은 경우
                 s3Service.delete(fileList.get(0).getFileUrl());
                 fileStorageService.deleteFile(fileList.get(0));
                 String receiptImageUrl = s3Service.upload("receiptImage", receiptImage.getOriginalFilename(), receiptImage);
                 File receiptFile = fileStorageService.saveFile(receiptImageUrl, FileType.receipt);
                 fileList.set(0, receiptFile);
             }
-            if (productImage != null && !productImage.isEmpty()) {
+            if (productImage != null && !productImage.isEmpty()) { // productImage 파일이 비어있지 않은 경우
                 s3Service.delete(fileList.get(1).getFileUrl());
                 fileStorageService.deleteFile(fileList.get(1));
                 String productImageUrl = s3Service.upload("productImage", productImage.getOriginalFilename(), productImage);
@@ -106,7 +124,7 @@ public class PostService {
     @Transactional
     public void deletePost(Long id, String email) {
         Post post = postRepository.findById(id).orElseThrow(() -> new PostException("Post not found with id: " + id, HttpStatus.NOT_FOUND));
-        if (!post.getMember().getEmail().equals(email)) {
+        if (!post.getMember().getEmail().equals(email)) { // 글을 등록한 사람만 삭제할 권한이 있다.
             throw new PostException("You do not have permission to delete this post", HttpStatus.FORBIDDEN);
         }
         try {
@@ -121,16 +139,30 @@ public class PostService {
     }
 
     @Transactional
-    public void updatePostStatusToTrading(Long id) {
+    public void updatePostStatusToTrading(Long id, String email) {
         Post post = postRepository.findById(id).orElseThrow(() -> new PostException("Post not found", HttpStatus.NOT_FOUND));
-        post.setPostStatus(PostStatus.거래중);
-        postRepository.save(post);
+        if (!post.getMember().getEmail().equals(email)) { // 글을 등록한 사람만 글 상태를 바꿀 수 있는 권한이 있다.
+            throw new PostException("You do not have permission to change this post status to trading", HttpStatus.FORBIDDEN);
+        }
+        try {
+            post.setPostStatus(PostStatus.거래중);
+            postRepository.save(post);
+        } catch (Exception e) {
+            throw new PostException("Failed to update post status to trading", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Transactional
-    public void updatePostStatusToCompleted(Long id) {
+    public void updatePostStatusToCompleted(Long id, String email) {
         Post post = postRepository.findById(id).orElseThrow(() -> new PostException("Post not found", HttpStatus.NOT_FOUND));
-        post.setPostStatus(PostStatus.거래완료);
-        postRepository.save(post);
+        if (!post.getMember().getEmail().equals(email)) { // 글을 등록한 사람만 글 상태를 바꿀 수 있는 권한이 있다.
+            throw new PostException("You do not have permission to change this post status to completed", HttpStatus.FORBIDDEN);
+        }
+        try {
+            post.setPostStatus(PostStatus.거래완료);
+            postRepository.save(post);
+        } catch (Exception e) {
+            throw new PostException("Failed to update post status to trading", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

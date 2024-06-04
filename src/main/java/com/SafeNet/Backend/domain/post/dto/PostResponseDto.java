@@ -11,7 +11,7 @@ import lombok.Getter;
 public class PostResponseDto {
     private Long postId;
     private Category category;
-    private boolean likeCount; // 현재 사용자가 하트를 눌렀는지 여부
+    private boolean isLikedByCurrentUser; // 현재 사용자가 하트를 눌렀는지 여부
     private String productImageUrl; // 상품 이미지 URL
     private String receiptImageUrl; // 영수증 이미지 URL
     private String title;
