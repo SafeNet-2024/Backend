@@ -40,7 +40,7 @@ public class PostService {
         Member member = commonPostService.getMemberByEmail(email);
         try {
             LocalDate parsedBuyDate = LocalDate.parse(postRequestDto.getBuyDate(), formatter);
-            Region region = member.getRegion();
+            Region region = member.getRegion(); // 로그인한 사용자의 지역 정보 추출
             String receiptImageUrl = s3Service.upload("receiptImage", receiptImage.getOriginalFilename(), receiptImage);
             String productImageUrl = s3Service.upload("productImage", productImage.getOriginalFilename(), productImage);
             File receiptFile = fileStorageService.saveFile(receiptImageUrl, FileType.receipt);
@@ -53,7 +53,7 @@ public class PostService {
                     .buyDate(parsedBuyDate)
                     .contents(postRequestDto.getContents())
                     .member(member)
-                    .region(region)
+                    .region(region) // 지역 정보 추가
                     .fileList(Arrays.asList(receiptFile, productFile))
                     .build();
             postRepository.save(post);
@@ -66,9 +66,27 @@ public class PostService {
         return commonPostService.getAllPosts(email);
     }
 
+    // 게시물 상세 조회
     public Optional<PostResponseDto> getPostById(Long id) {
-        return postRepository.findById(id).map(post -> PostDtoConverter.convertToDto(post, false));
+        return postRepository.findById(id).map(PostService::convertToDetailDto);
     }
+
+    private static PostResponseDto convertToDetailDto(Post post) {
+        return PostResponseDto.builder()
+                .postId(post.getId())
+                .category(post.getCategory())
+                .isLikedByCurrentUser(false)
+                .productImageUrl(post.getFileList().isEmpty() ? null : post.getFileList().get(1).getFileUrl())
+                .receiptImageUrl(post.getFileList().isEmpty() ? null : post.getFileList().get(0).getFileUrl())
+                .title(post.getTitle())
+                .count(post.getCount())
+                .buyDate(post.getBuyDate() != null ? post.getBuyDate().toString() : null)
+                .contents(post.getContents())
+                .writer(post.getMember().getName())
+                .cost(post.getCost())
+                .build();
+    }
+
 
     @Transactional
     public void updatePost(Long id, PostRequestDto postRequestDto, MultipartFile receiptImage, MultipartFile productImage, String email) {
