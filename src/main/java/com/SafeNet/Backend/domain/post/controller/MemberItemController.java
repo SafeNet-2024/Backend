@@ -20,10 +20,10 @@ public class MemberItemController {
     private final MemberItemService memberItemService;
 
     @GetMapping("/my-posts")
-    public ResponseEntity<?> getPostsByMemberId(@RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
-                                                @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken) {
+    public ResponseEntity<?> getPostsByMemberId(
+            @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
+            @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken) {
         String email = getUserEmail();
-
         List<PostResponseDto> posts = memberItemService.getPostsByMemberId(email);
         if (posts.isEmpty()) {
             return ResponseEntity.ok("사용자가 등록한 게시물이 없습니다.");
@@ -32,16 +32,17 @@ public class MemberItemController {
     }
 
     @GetMapping("/liked-posts")
-    public ResponseEntity<?> getLikedPostsByMemberId(@RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
-                                                     @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken) {
+    public ResponseEntity<?> getLikedPostsByMemberId(
+            @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
+            @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken) {
         String email = getUserEmail();
-
         List<PostResponseDto> likedPosts = memberItemService.getLikedPostsByMemberId(email);
         if (likedPosts.isEmpty()) {
             return ResponseEntity.ok("등록된 찜이 없습니다.");
         }
         return ResponseEntity.ok(likedPosts);
     }
+
     @ExceptionHandler(PostException.class)
     public ResponseEntity<String> handleCustomException(PostException e) {
         return ResponseEntity.status(e.getStatus()).body(e.getMessage());
