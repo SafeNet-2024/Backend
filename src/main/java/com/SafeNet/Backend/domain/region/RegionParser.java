@@ -7,7 +7,7 @@ public class RegionParser {
     public static Region parseRegion(String address) {
         String[] parts = address.split(" ");
 
-        if (parts.length != 3) {
+        if (parts.length < 3) {
             throw new IllegalArgumentException("Address must be in the format 'City County District'");
         }
 
