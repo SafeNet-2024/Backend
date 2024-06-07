@@ -75,7 +75,6 @@ public class PostService {
         return PostResponseDto.builder()
                 .postId(post.getId())
                 .category(post.getCategory())
-                .isLikedByCurrentUser(false)
                 .productImageUrl(post.getFileList().isEmpty() ? null : post.getFileList().get(1).getFileUrl())
                 .receiptImageUrl(post.getFileList().isEmpty() ? null : post.getFileList().get(0).getFileUrl())
                 .title(post.getTitle())
@@ -140,7 +139,7 @@ public class PostService {
 
     @Transactional
     public void updatePostStatusToTrading(Long id, String email) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new PostException("Post not found", HttpStatus.NOT_FOUND));
+        Post post = postRepository.findById(id).orElseThrow(() -> new PostException("Post not found with id: " + id, HttpStatus.NOT_FOUND));
         if (!post.getMember().getEmail().equals(email)) { // 글을 등록한 사람만 글 상태를 바꿀 수 있는 권한이 있다.
             throw new PostException("You do not have permission to change this post status to trading", HttpStatus.FORBIDDEN);
         }
@@ -154,9 +153,9 @@ public class PostService {
 
     @Transactional
     public void updatePostStatusToCompleted(Long id, String email) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new PostException("Post not found", HttpStatus.NOT_FOUND));
+        Post post = postRepository.findById(id).orElseThrow(() -> new PostException("Post not found with id: " + id, HttpStatus.NOT_FOUND));
         if (!post.getMember().getEmail().equals(email)) { // 글을 등록한 사람만 글 상태를 바꿀 수 있는 권한이 있다.
-            throw new PostException("You do not have permission to change this post status to completed", HttpStatus.FORBIDDEN);
+                throw new PostException("You do not have permission to change this post status to completed", HttpStatus.FORBIDDEN);
         }
         try {
             post.setPostStatus(PostStatus.거래완료);
