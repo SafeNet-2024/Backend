@@ -17,6 +17,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,7 +34,9 @@ public class MessageController {
 
     @MessageMapping("/chat/message")
     @Operation(summary = "메시지 발송", description = "WebSocket을 통해 메시지를 발송한다")
-    public void message(MessageDto messageDto) {
+    public void message(@RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
+                        @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken,
+                        MessageDto messageDto) {
         // 클라이언트 채팅방(topic) 입장, 대화를 위해 리스너와 연동
         messageRoomService.enterMessageRoom(messageDto.getRoomId());
 
@@ -62,7 +65,10 @@ public class MessageController {
             @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content(mediaType = "application/json"))
     })
     @Parameter(name = "roomId", description = "메시지를 조회할 채팅방의 ID", required = true, example = "123")
-    public ResponseEntity<List<MessageDto>> loadMessage(@PathVariable String roomId) {
+    public ResponseEntity<List<MessageDto>> loadMessage(
+            @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
+            @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken,
+            @PathVariable String roomId) {
         return ResponseEntity.ok(messageService.loadMessage(roomId));
     }
 }
