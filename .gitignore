@@ -27,6 +27,9 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 src/main/resources/application.properties
+src/main/resources/test
+src/main/resources/initial_region_data.sql
+src/main/resources/update_region_data.sql
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/

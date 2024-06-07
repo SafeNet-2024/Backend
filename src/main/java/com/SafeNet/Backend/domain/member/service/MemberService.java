@@ -118,10 +118,10 @@ public class MemberService {
     /*
      ** 로그아웃
      */
-    public void logout(String email) {
+    public void logout(String email, String atk) {
         //Token에서 로그인한 사용자 정보 get해 로그아웃 처리
         try {
-            jwtTokenProvider.logout("JWT_TOKEN:" + email); //Token 삭제
+            jwtTokenProvider.logout(email, atk); //Token 삭제
         }catch (CustomException ex) {
             throw new CustomException("이미 로그아웃된 유저입니다");
         }
