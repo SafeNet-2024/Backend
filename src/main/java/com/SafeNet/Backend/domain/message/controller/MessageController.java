@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;  // 로깅을 위해 추가
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
+@Slf4j
 @RequiredArgsConstructor
 @Controller
 @Tag(name = "Message", description = "Message API")
@@ -37,6 +38,16 @@ public class MessageController {
     public void message(@RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
                         @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken,
                         MessageDto messageDto) {
+
+        // 로깅 추가
+        log.info("Received message:");
+        log.info(" - sender: {}", messageDto.getSender());
+        log.info(" - roomId: {}", messageDto.getRoomId());
+        log.info(" - message: {}", messageDto.getMessage());
+        log.info(" - sentTime: {}", messageDto.getSentTime());
+        log.info("ACCESS_TOKEN: {}", accessToken);
+        log.info("REFRESH_TOKEN: {}", refreshToken);
+
         // 클라이언트 채팅방(topic) 입장, 대화를 위해 리스너와 연동
         messageRoomService.enterMessageRoom(messageDto.getRoomId());
 
