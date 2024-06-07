@@ -18,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -36,9 +37,17 @@ public class MessageController {
         // 클라이언트 채팅방(topic) 입장, 대화를 위해 리스너와 연동
         messageRoomService.enterMessageRoom(messageDto.getRoomId());
 
+        // MessageDto 객체를 빌더를 통해 생성하고 현재 시간을 설정
+        MessageDto messageWithTime = MessageDto.builder()
+                .sender(messageDto.getSender())
+                .roomId(messageDto.getRoomId())
+                .message(messageDto.getMessage())
+                .sentTime(LocalDateTime.now().toString())
+                .build();
+
         // Websocket에 발행된 메시지를 redis로 발행한다(publish)
         // 해당 쪽지방을 구독(subscribe)한 클라이언트에게 메시지가 실시간 전송
-        redisPublisher.publish(messageRoomService.getTopic(messageDto.getRoomId()), messageDto);
+        redisPublisher.publish(messageRoomService.getTopic(messageDto.getRoomId()), messageWithTime);
 
         // DB와 Redis에 메시지 저장
         messageService.saveMessage(messageDto);
