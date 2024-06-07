@@ -1,5 +1,6 @@
 package com.SafeNet.Backend.global.auth;
 
+import ch.qos.logback.core.status.Status;
 import com.SafeNet.Backend.domain.member.dto.TokenResponseDto;
 import com.SafeNet.Backend.domain.member.service.UserDetailsServiceImpl;
 import com.SafeNet.Backend.global.exception.CustomException;
@@ -9,12 +10,14 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
+import jdk.jshell.Snippet;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +25,7 @@ import org.springframework.stereotype.Component;
 
 
 import java.security.Key;
+import java.time.Duration;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 @Component
@@ -142,8 +146,9 @@ public class JwtTokenProvider {
             throw new CustomException("INVALID_JWT");
         }
     }
-
-    // 모든 토큰 헤더 설정
+    /*
+     * 모든 토큰 헤더 설정
+     */
     public void setHeaderToken(HttpServletResponse response, TokenResponseDto dto) {
         response.setHeader("Access_Token", dto.getAccessToken());
         response.setHeader("Refresh_Token", dto.getRefreshToken());
@@ -152,9 +157,30 @@ public class JwtTokenProvider {
     /*
      * 로그아웃 로직 - Refresh 토큰을 redis에서 삭제
      */
-    public void logout(String email) {
-        if(tokenRedisTemplate.opsForValue().get("JWT_TOKEN:" + email) != null) {
+    public ResponseEntity<Status> logout(String email, String token) {
+        String atk= token.substring(7);
+        Long expiration = getExpiration(atk);
+        if(tokenRedisTemplate.opsForValue().get(email) != null) {
             tokenRedisTemplate.delete(email);
         }
+        // [ 블랙리스트 생성 단계 ] redis에 가져온 key(JWT 토큰) : value("logout")으로 저장
+        tokenRedisTemplate.opsForValue().set(atk, "logout", Duration.ofMillis(expiration));
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    /*
+     * 유효기간 가져오기
+     */
+    public Long getExpiration(String accessToken) {
+        // accessToken 남은 유효시간
+        Date expiration = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(accessToken)
+                .getBody()
+                .getExpiration();
+        // 현재 시간
+        Long now = new Date().getTime();
+        return (expiration.getTime() - now);
     }
 }

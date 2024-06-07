@@ -3,6 +3,7 @@ package com.SafeNet.Backend.domain.member.controller;
 import com.SafeNet.Backend.domain.member.dto.*;
 import com.SafeNet.Backend.domain.member.entity.UserDetailsImpl;
 import com.SafeNet.Backend.domain.member.service.EmailService;
+import com.SafeNet.Backend.domain.member.service.JwtBlacklistService;
 import com.SafeNet.Backend.domain.member.service.MemberService;
 import com.SafeNet.Backend.global.exception.CustomException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,6 +29,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final EmailService mailService;
+    private final JwtBlacklistService jwtBlacklistService;
 
     @Operation(summary = "회원가입", description = "회원가입을 승인합니다.")
     @PostMapping("/signup")
@@ -91,7 +93,7 @@ public class MemberController {
         UserDetailsImpl userDetails = (UserDetailsImpl) principal;
         String email = userDetails.getUsername();
         log.info("토큰으로부터 이메일을 추출하였습니다.: "+email);
-        memberService.logout(email);
+        memberService.logout(email, accessToken);
         return ResponseEntity.ok().build();
     }
 

@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -44,23 +45,24 @@ public class JwtFilter extends OncePerRequestFilter {
             // 2. validateToken 으로 토큰 유효성 검사
             if (token != null && jwtTokenProvider.validateToken(token)) {
                 log.info("dofilterInternal : [토큰유효성 검사 통과.]");
-                Authentication auth = jwtTokenProvider.getAuthentication(token);
-                SecurityContextHolder.getContext().setAuthentication(auth); // 정상 토큰이면 SecurityContext에 저장
                 //Redis 에 해당 accessToken logout 여부 확인 : Logout이면 Redis에 특정값이 저장되어있음
                 String isLogout = (String)redisTemplate.opsForValue().get(token);
-                if (ObjectUtils.isEmpty(isLogout)) { //로그아웃 상태라면,
+                if (ObjectUtils.isEmpty(isLogout)) { // 로그아웃 상태가 아니라면
                     // 토큰이 유효할 경우 토큰에서 Authentication 객체를 가지고 와서 SecurityContext 에 저장
                     Authentication authentication = jwtTokenProvider.getAuthentication(token);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+                }else {
+                    log.info("유효한 JWT 토큰이 없습니다. (로그아웃된 토큰) ");
+                    throw new AuthenticationException("로그아웃된 토큰입니다.") {};
                 }
             }
         } catch (RedisConnectionFailureException e) {
             SecurityContextHolder.clearContext();
             writeErrorResponse(response, HttpStatus.INTERNAL_SERVER_ERROR, "REDIS_ERROR", e);
-        } catch (Exception e) {
-            writeErrorResponse(response, HttpStatus.BAD_REQUEST, "INVALID_JWT", e);
+        } catch (AuthenticationException e) {
+            SecurityContextHolder.clearContext();
+            writeErrorResponse(response, HttpStatus.UNAUTHORIZED, "로그아웃된 계정입니다.", e);
         }
-
         try {
             filterChain.doFilter(request, response);
         } catch (Exception e) {
