@@ -87,14 +87,25 @@ public class MemberController {
 
     @PostMapping(value = "/logout")
     @Operation(summary = "로그아웃", description = "JWt 토큰을 redis에서 삭제합니다")
-    public ResponseEntity<Void> logout(            @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
+    public ResponseEntity<LogoutResponseDto> logout(            @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
                                                    @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken) {
+        String message = "";
+        HttpStatus status = HttpStatus.OK;
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserDetailsImpl userDetails = (UserDetailsImpl) principal;
         String email = userDetails.getUsername();
         log.info("토큰으로부터 이메일을 추출하였습니다.: "+email);
-        memberService.logout(email, accessToken);
-        return ResponseEntity.ok().build();
+        try {
+            memberService.logout(email, accessToken);
+            message ="로그아웃을 성공적으로 완료했습니다.";
+        } catch (Exception ex){
+            throw new CustomException("로그아웃과정 중 에러가 발생했습니다. : "+ ex.getMessage());
+        }
+        LogoutResponseDto logoutResponseDto
+                = LogoutResponseDto.builder().
+                result(message).
+                build();
+        return ResponseEntity.status(status).body(logoutResponseDto);
     }
 
     @PatchMapping("/address")

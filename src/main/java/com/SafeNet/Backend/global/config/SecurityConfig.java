@@ -4,18 +4,15 @@ import com.SafeNet.Backend.global.auth.JwtFilter;
 import com.SafeNet.Backend.global.auth.JwtTokenProvider;
 import com.SafeNet.Backend.global.exception.JwtAccessDeniedHandler;
 import com.SafeNet.Backend.global.exception.JwtAuthenticationEntryPoint;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -59,10 +56,6 @@ public class SecurityConfig {
                         .requestMatchers("/", "/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/s3/test", "/ws-stomp/**").permitAll()  // 특정 경로에 대한 접근 허용
 //                        .requestMatchers(HttpMethod.GET,"/api/v2/posts/{postId}").permitAll()  // GET 요청 허용
                         .anyRequest().authenticated())  // 나머지 요청은 인증 필요
-                //.formLogin(form -> form
-                //       .loginPage("/login").permitAll())  // 로그인 페이지 설정
-                //.logout(logout -> logout
-                //        .logoutSuccessUrl("/").permitAll())  // 로그아웃 성공시 리다이렉션 설정
                 .exceptionHandling(authenticationManager -> authenticationManager
                         .accessDeniedHandler(jwtAccessDeniedHandler)
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint))
