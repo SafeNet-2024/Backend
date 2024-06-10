@@ -52,7 +52,11 @@ public class CommonPostService {
         return convertPostsToDto(posts, memberId, email);
     }
 
-    // 사용자가 등록한 게시물 조회
+    public void getPostById(String email) {
+        getMemberByEmail(email);
+    }
+
+        // 사용자가 등록한 게시물 조회
     public List<PostResponseDto> getPostsByMemberId(String email) {
         Member member = getMemberByEmail(email);
         Long memberId = member.getId();
