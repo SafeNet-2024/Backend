@@ -36,8 +36,9 @@ public class CommonPostService {
 
     public List<PostResponseDto> convertPostsToDto(List<Post> posts, Long memberId, String email) {
         return posts.stream().map(post -> {
-            boolean isLikedByCurrentUser = postLikeRepository.existsByPostIdAndMemberId(post.getId(), memberId);
-            return PostDtoConverter.convertToDto(post, isLikedByCurrentUser, post.getMember().getEmail().equals(email),post.getPostStatus());
+            boolean isLikedByCurrentUser = post.getPostLikeList().stream()
+                    .anyMatch(like -> like.getMember().getId().equals(memberId));
+            return PostDtoConverter.convertToDto(post, isLikedByCurrentUser, post.getMember().getEmail().equals(email), post.getPostStatus());
         }).collect(Collectors.toList());
     }
 
