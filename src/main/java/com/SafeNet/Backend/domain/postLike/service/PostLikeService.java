@@ -25,8 +25,13 @@
 
         @Transactional
         public boolean likePost(Long postId, String email) {
-            Post post = postRepository.findById(postId).orElseThrow(() -> new PostException("Post not found with id: " + postId, HttpStatus.NOT_FOUND));
-            Member member = memberRepository.findByEmail(email).orElseThrow(() -> new PostException("Member not found with email: " + email, HttpStatus.NOT_FOUND));
+            Post post = postRepository.findById(postId).orElseThrow(() -> new PostException("Post not found with id: " + postId, HttpStatus.NOT_FOUND)); // 유효한 게시물인지 검사
+            Member member = memberRepository.findByEmail(email).orElseThrow(() -> new PostException("Member not found with email: " + email, HttpStatus.NOT_FOUND)); // 유효한 멤버인지 검사
+
+            if (post.getMember().getEmail().equals(email)) {
+                throw new PostException("You cannot like your own post", HttpStatus.BAD_REQUEST); // 자신의 게시물일 경우 좋아요를 생성하지 못하게 하기
+            }
+
             Optional<PostLike> existingLike = postLikeRepository.findByPostIdAndMemberId(postId, member.getId());
 
             if (existingLike.isPresent()) {

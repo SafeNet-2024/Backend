@@ -68,7 +68,8 @@ public class PostController {
             @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
             @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken,
             @PathVariable("postId") Long postId) {
-        Optional<PostResponseDto> postById = postService.getPostById(postId);
+        String email = getUserEmail();
+        Optional<PostResponseDto> postById = postService.getPostById(postId, email);
         if (postById.isPresent()) {
             return ResponseEntity.ok(postById.get());
         } else {
@@ -103,7 +104,7 @@ public class PostController {
     }
 
     @PatchMapping("/{postId}/status/trading")
-    @Operation(summary = "게시물 상태 거래중으로 변경", description = "채팅방에서 '거래중'으로 변경할 때 사용하는 API")
+    @Operation(summary = "게시물 상태 거래중으로 변경", description = "판매자가 채팅방에서 '거래중'으로 변경할 때 사용하는 API")
     public ResponseEntity<String> updatePostStatusToTrading(
             @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
             @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken,
@@ -114,7 +115,7 @@ public class PostController {
     }
 
     @PatchMapping("/{postId}/status/completed")
-    @Operation(summary = "게시물 상태 거래완료로 변경", description = "채팅방에서 '거래완료'로 변경할 때 사용하는 API")
+    @Operation(summary = "게시물 상태 거래완료로 변경", description = "판매자가 채팅방에서 '거래완료'로 변경할 때 사용하는 API")
     public ResponseEntity<String> updatePostStatusToCompleted(
             @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
             @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken,
