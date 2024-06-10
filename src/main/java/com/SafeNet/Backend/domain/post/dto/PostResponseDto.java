@@ -1,6 +1,7 @@
 package com.SafeNet.Backend.domain.post.dto;
 
 import com.SafeNet.Backend.domain.post.entity.Category;
+import com.SafeNet.Backend.domain.post.entity.PostStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,4 +21,6 @@ public class PostResponseDto {
     private String contents;
     private String writer;
     private int cost;
+    private boolean isMine; // 현재 사용자가 등록한 글인지
+    private PostStatus postStatus; // 현재 게시글의 상태
 }
