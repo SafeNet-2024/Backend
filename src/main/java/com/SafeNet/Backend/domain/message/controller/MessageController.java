@@ -12,14 +12,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;  // 로깅을 위해 추가
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 
+import java.time.LocalDateTime;
 import java.util.List;
-
+@Slf4j
 @RequiredArgsConstructor
 @Controller
 @Tag(name = "Message", description = "Message API")
@@ -32,13 +35,33 @@ public class MessageController {
 
     @MessageMapping("/chat/message")
     @Operation(summary = "메시지 발송", description = "WebSocket을 통해 메시지를 발송한다")
-    public void message(MessageDto messageDto) {
+    public void message(@RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
+                        @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken,
+                        MessageDto messageDto) {
+
+        // 로깅 추가
+        log.info("Received message:");
+        log.info(" - sender: {}", messageDto.getSender());
+        log.info(" - roomId: {}", messageDto.getRoomId());
+        log.info(" - message: {}", messageDto.getMessage());
+        log.info(" - sentTime: {}", messageDto.getSentTime());
+        log.info("ACCESS_TOKEN: {}", accessToken);
+        log.info("REFRESH_TOKEN: {}", refreshToken);
+
         // 클라이언트 채팅방(topic) 입장, 대화를 위해 리스너와 연동
         messageRoomService.enterMessageRoom(messageDto.getRoomId());
 
+        // MessageDto 객체를 빌더를 통해 생성하고 현재 시간을 설정
+        MessageDto messageWithTime = MessageDto.builder()
+                .sender(messageDto.getSender())
+                .roomId(messageDto.getRoomId())
+                .message(messageDto.getMessage())
+                .sentTime(LocalDateTime.now().toString())
+                .build();
+
         // Websocket에 발행된 메시지를 redis로 발행한다(publish)
         // 해당 쪽지방을 구독(subscribe)한 클라이언트에게 메시지가 실시간 전송
-        redisPublisher.publish(messageRoomService.getTopic(messageDto.getRoomId()), messageDto);
+        redisPublisher.publish(messageRoomService.getTopic(messageDto.getRoomId()), messageWithTime);
 
         // DB와 Redis에 메시지 저장
         messageService.saveMessage(messageDto);
@@ -53,7 +76,10 @@ public class MessageController {
             @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content(mediaType = "application/json"))
     })
     @Parameter(name = "roomId", description = "메시지를 조회할 채팅방의 ID", required = true, example = "123")
-    public ResponseEntity<List<MessageDto>> loadMessage(@PathVariable String roomId) {
+    public ResponseEntity<List<MessageDto>> loadMessage(
+            @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
+            @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken,
+            @PathVariable String roomId) {
         return ResponseEntity.ok(messageService.loadMessage(roomId));
     }
 }

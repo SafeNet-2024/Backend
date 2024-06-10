@@ -3,6 +3,7 @@ package com.SafeNet.Backend.domain.member.controller;
 import com.SafeNet.Backend.domain.member.dto.*;
 import com.SafeNet.Backend.domain.member.entity.UserDetailsImpl;
 import com.SafeNet.Backend.domain.member.service.EmailService;
+import com.SafeNet.Backend.domain.member.service.JwtBlacklistService;
 import com.SafeNet.Backend.domain.member.service.MemberService;
 import com.SafeNet.Backend.global.exception.CustomException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,6 +29,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final EmailService mailService;
+    private final JwtBlacklistService jwtBlacklistService;
 
     @Operation(summary = "회원가입", description = "회원가입을 승인합니다.")
     @PostMapping("/signup")
@@ -85,14 +87,25 @@ public class MemberController {
 
     @PostMapping(value = "/logout")
     @Operation(summary = "로그아웃", description = "JWt 토큰을 redis에서 삭제합니다")
-    public ResponseEntity<Void> logout(            @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
+    public ResponseEntity<LogoutResponseDto> logout(            @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
                                                    @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken) {
+        String message = "";
+        HttpStatus status = HttpStatus.OK;
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserDetailsImpl userDetails = (UserDetailsImpl) principal;
         String email = userDetails.getUsername();
         log.info("토큰으로부터 이메일을 추출하였습니다.: "+email);
-        memberService.logout(email);
-        return ResponseEntity.ok().build();
+        try {
+            memberService.logout(email, accessToken);
+            message ="로그아웃을 성공적으로 완료했습니다.";
+        } catch (Exception ex){
+            throw new CustomException("로그아웃과정 중 에러가 발생했습니다. : "+ ex.getMessage());
+        }
+        LogoutResponseDto logoutResponseDto
+                = LogoutResponseDto.builder().
+                result(message).
+                build();
+        return ResponseEntity.status(status).body(logoutResponseDto);
     }
 
     @PatchMapping("/address")
