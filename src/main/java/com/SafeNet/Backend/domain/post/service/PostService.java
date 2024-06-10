@@ -5,13 +5,13 @@ import com.SafeNet.Backend.domain.file.entity.FileType;
 import com.SafeNet.Backend.domain.file.service.FileStorageService;
 import com.SafeNet.Backend.domain.file.service.S3Service;
 import com.SafeNet.Backend.domain.member.entity.Member;
+import com.SafeNet.Backend.domain.member.repository.MemberRepository;
 import com.SafeNet.Backend.domain.post.dto.PostRequestDto;
 import com.SafeNet.Backend.domain.post.dto.PostResponseDto;
 import com.SafeNet.Backend.domain.post.entity.Post;
 import com.SafeNet.Backend.domain.post.entity.PostStatus;
 import com.SafeNet.Backend.domain.post.exception.PostException;
 import com.SafeNet.Backend.domain.post.repository.PostRepository;
-import com.SafeNet.Backend.domain.post.util.PostDtoConverter;
 import com.SafeNet.Backend.domain.region.entity.Region;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,6 +24,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
 
 @Service
 @Transactional(readOnly = true)
@@ -68,6 +69,7 @@ public class PostService {
 
     // 게시물 상세 조회
     public Optional<PostResponseDto> getPostById(Long id, String email) {
+        commonPostService.getPostById(email); // 게시물 상세보기를 하기 전 유효한 사용자인지 체크
         return postRepository.findById(id).map(post -> convertToDetailDto(post, post.getMember().getEmail().equals(email), post.getPostStatus()));
     }
 
@@ -93,7 +95,7 @@ public class PostService {
     @Transactional
     public void updatePost(Long id, PostRequestDto postRequestDto, MultipartFile receiptImage, MultipartFile productImage, String email) {
         Post existingPost = postRepository.findById(id).orElseThrow(() -> new PostException("Post not found with id: " + id, HttpStatus.NOT_FOUND));
-        if (!existingPost.getMember().getEmail().equals(email)) {
+        if (!existingPost.getMember().getEmail().equals(email)) { // 존재하는 사용자인지 & 글 등록한 사람인지 검사
             throw new PostException("You do not have permission to update this post", HttpStatus.FORBIDDEN); // 글을 등록한 사람만 수정할 수 있는 권한이 있다.
         }
         try {
@@ -126,8 +128,8 @@ public class PostService {
     @Transactional
     public void deletePost(Long id, String email) {
         Post post = postRepository.findById(id).orElseThrow(() -> new PostException("Post not found with id: " + id, HttpStatus.NOT_FOUND));
-        if (!post.getMember().getEmail().equals(email)) { // 글을 등록한 사람만 삭제할 권한이 있다.
-            throw new PostException("You do not have permission to delete this post", HttpStatus.FORBIDDEN);
+        if (!post.getMember().getEmail().equals(email)) { // 존재하는 사용자인지 & 글 등록한 사람인지 검사
+            throw new PostException("You do not have permission to delete this post", HttpStatus.FORBIDDEN); // 글을 등록한 사람만 삭제할 권한이 있다.
         }
         try {
             if (post.getPostStatus() != PostStatus.거래가능) {
@@ -143,8 +145,8 @@ public class PostService {
     @Transactional
     public void updatePostStatusToTrading(Long id, String email) {
         Post post = postRepository.findById(id).orElseThrow(() -> new PostException("Post not found", HttpStatus.NOT_FOUND));
-        if (!post.getMember().getEmail().equals(email)) { // 글을 등록한 사람만 글 상태를 바꿀 수 있는 권한이 있다.
-            throw new PostException("You do not have permission to change this post status to trading", HttpStatus.FORBIDDEN);
+        if (!post.getMember().getEmail().equals(email)) { // 존재하는 사용자인지 & 글 등록한 사람인지 검사
+            throw new PostException("You do not have permission to change this post status to trading", HttpStatus.FORBIDDEN); // 글을 등록한 사람만 글 상태를 바꿀 수 있는 권한이 있다.
         }
         try {
             post.setPostStatus(PostStatus.거래중);
@@ -157,8 +159,8 @@ public class PostService {
     @Transactional
     public void updatePostStatusToCompleted(Long id, String email) {
         Post post = postRepository.findById(id).orElseThrow(() -> new PostException("Post not found", HttpStatus.NOT_FOUND));
-        if (!post.getMember().getEmail().equals(email)) { // 글을 등록한 사람만 글 상태를 바꿀 수 있는 권한이 있다.
-            throw new PostException("You do not have permission to change this post status to completed", HttpStatus.FORBIDDEN);
+        if (!post.getMember().getEmail().equals(email)) { // 존재하는 사용자인지 & 글 등록한 사람인지 검사
+            throw new PostException("You do not have permission to change this post status to completed", HttpStatus.FORBIDDEN); // 글을 등록한 사람만 글 상태를 바꿀 수 있는 권한이 있다.
         }
         try {
             post.setPostStatus(PostStatus.거래완료);
