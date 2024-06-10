@@ -67,11 +67,11 @@ public class PostService {
     }
 
     // 게시물 상세 조회
-    public Optional<PostResponseDto> getPostById(Long id) {
-        return postRepository.findById(id).map(PostService::convertToDetailDto);
+    public Optional<PostResponseDto> getPostById(Long id, String email) {
+        return postRepository.findById(id).map(post -> convertToDetailDto(post, post.getMember().getEmail().equals(email), post.getPostStatus()));
     }
 
-    private static PostResponseDto convertToDetailDto(Post post) {
+    private static PostResponseDto convertToDetailDto(Post post, boolean isMine, PostStatus postStatus) {
         return PostResponseDto.builder()
                 .postId(post.getId())
                 .category(post.getCategory())
@@ -84,6 +84,8 @@ public class PostService {
                 .contents(post.getContents())
                 .writer(post.getMember().getName())
                 .cost(post.getCost())
+                .isMine(isMine)
+                .postStatus(postStatus)
                 .build();
     }
 
