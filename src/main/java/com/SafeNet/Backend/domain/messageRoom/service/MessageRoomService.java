@@ -3,7 +3,6 @@ package com.SafeNet.Backend.domain.messageroom.service;
 import com.SafeNet.Backend.domain.member.entity.Member;
 import com.SafeNet.Backend.domain.member.repository.MemberRepository;
 import com.SafeNet.Backend.domain.message.entity.Message;
-import com.SafeNet.Backend.domain.message.dto.MessageRequestDto;
 import com.SafeNet.Backend.domain.message.dto.MessageResponseDto;
 import com.SafeNet.Backend.domain.message.repository.MessageRepository;
 import com.SafeNet.Backend.domain.messageroom.entity.MessageRoom;
@@ -68,7 +67,11 @@ public class MessageRoomService {
     // 1:1 채팅방 생성
     public MessageResponseDto createRoom(Long postId, String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(() -> new PostException("Member not found with email: " + email, HttpStatus.NOT_FOUND));
-        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+        Post post = postRepository.findById(postId).orElseThrow(() -> new PostException("Post not found with id: " + postId, HttpStatus.NOT_FOUND));
+
+        if (post.getMember().getEmail().equals(email)) {
+            throw new PostException("You cannot create a chat room for your own post", HttpStatus.BAD_REQUEST); // 게시물 작성자인 경우 채팅방을 생성하지 못하도록 예외 처리
+        }
 
         String receiver = post.getMember().getName(); // 게시물의 작성자를 receiver로 설정
 
