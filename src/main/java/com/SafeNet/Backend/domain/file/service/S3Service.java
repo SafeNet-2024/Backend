@@ -11,6 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -86,6 +88,8 @@ public class S3Service {
     }
 
     private String extractFileKey(String fileUrl) {
-        return fileUrl.substring(fileUrl.indexOf(bucket) + bucket.length() + 1);
+        // S3 버킷 URL 부분 제거하여 파일 키 추출
+        String fileKey = fileUrl.substring(fileUrl.indexOf(bucket) + bucket.length() + 1); // 버킷 이름을 제외한 나머지 부분을 파일 키로 추출
+        return URLDecoder.decode(fileKey, StandardCharsets.UTF_8);
     }
 }
