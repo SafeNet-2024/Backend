@@ -3,7 +3,6 @@ package com.SafeNet.Backend.domain.messageroom.service;
 import com.SafeNet.Backend.domain.member.entity.Member;
 import com.SafeNet.Backend.domain.member.repository.MemberRepository;
 import com.SafeNet.Backend.domain.message.entity.Message;
-import com.SafeNet.Backend.domain.message.dto.MessageRequestDto;
 import com.SafeNet.Backend.domain.message.dto.MessageResponseDto;
 import com.SafeNet.Backend.domain.message.repository.MessageRepository;
 import com.SafeNet.Backend.domain.messageroom.entity.MessageRoom;
@@ -49,7 +48,7 @@ public class MessageRoomService {
             MemberRepository memberRepository,
             RedisMessageListenerContainer redisMessageListener,
             RedisSubscriber redisSubscriber,
-            @Qualifier("redisTemplate") RedisTemplate<String, Object> redisTemplate) {
+            @Qualifier("customRedisTemplate") RedisTemplate<String, Object> redisTemplate) {
         this.messageRoomRepository = messageRoomRepository;
         this.messageRepository = messageRepository;
         this.postRepository = postRepository;
@@ -68,7 +67,11 @@ public class MessageRoomService {
     // 1:1 채팅방 생성
     public MessageResponseDto createRoom(Long postId, String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(() -> new PostException("Member not found with email: " + email, HttpStatus.NOT_FOUND));
-        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+        Post post = postRepository.findById(postId).orElseThrow(() -> new PostException("Post not found with id: " + postId, HttpStatus.NOT_FOUND));
+
+        if (post.getMember().getEmail().equals(email)) {
+            throw new PostException("You cannot create a chat room for your own post", HttpStatus.BAD_REQUEST); // 게시물 작성자인 경우 채팅방을 생성하지 못하도록 예외 처리
+        }
 
         String receiver = post.getMember().getName(); // 게시물의 작성자를 receiver로 설정
 
@@ -174,17 +177,17 @@ public class MessageRoomService {
         Member member = memberRepository.findByEmail(email).orElseThrow(() -> new PostException("Member not found with email: " + email, HttpStatus.NOT_FOUND));
 
         MessageRoom messageRoom = messageRoomRepository.findByRoomId(roomId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 쪽지방이 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("The chat room does not exist."));
 
         // 게시글 검증 없이 메시지룸의 post 참조
         Post post = messageRoom.getPost();
         if (post == null) {
-            throw new IllegalArgumentException("쪽지방에 연결된 게시물이 존재하지 않습니다.");
+            throw new IllegalArgumentException("The chat room is not connected to any post.");
         }
 
         // sender 또는 receiver 확인
         if (!messageRoom.getSender().equals(member.getName()) && !messageRoom.getReceiver().equals(member.getName())) {
-            throw new IllegalArgumentException("해당 쪽지방에 접근할 권한이 없습니다.");
+            throw new IllegalArgumentException("You do not have permission to access this chat room.");
         }
 
         return MessageRoomDto.builder()
@@ -227,7 +230,7 @@ public class MessageRoomService {
             messageRoomRepository.delete(messageRoom);
             opsHashMessageRoom.delete(Message_Rooms, messageRoom.getRoomId());
             return MessageResponseDto.builder()
-                    .message("receiver와 sender가 모두 방을 나갔습니다.")
+                    .message("Both the receiver and the sender have left the room.")
                     .status(HttpStatus.OK.value())
                     .build();
         } else {
@@ -247,7 +250,7 @@ public class MessageRoomService {
             opsHashMessageRoom.put(Message_Rooms, messageRoomDto.getRoomId(), messageRoomDto); // Redis 업데이트
 
             return MessageResponseDto.builder()
-                    .message("상대방이 방을 나갔으므로 더 이상 채팅이 불가능합니다.")
+                    .message("The other person has left the room, so further chatting is not possible.")
                     .status(HttpStatus.OK.value())
                     .build();
         }

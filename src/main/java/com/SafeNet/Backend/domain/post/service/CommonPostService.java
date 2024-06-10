@@ -34,10 +34,11 @@ public class CommonPostService {
         return region.getId();
     }
 
-    public List<PostResponseDto> convertPostsToDto(List<Post> posts, Long memberId) {
+    public List<PostResponseDto> convertPostsToDto(List<Post> posts, Long memberId, String email) {
         return posts.stream().map(post -> {
-            boolean isLikedByCurrentUser = postLikeRepository.existsByPostIdAndMemberId(post.getId(), memberId);
-            return PostDtoConverter.convertToDto(post, isLikedByCurrentUser);
+            boolean isLikedByCurrentUser = post.getPostLikeList().stream()
+                    .anyMatch(like -> like.getMember().getId().equals(memberId));
+            return PostDtoConverter.convertToDto(post, isLikedByCurrentUser, post.getMember().getEmail().equals(email), post.getPostStatus());
         }).collect(Collectors.toList());
     }
 
@@ -45,18 +46,22 @@ public class CommonPostService {
     public List<PostResponseDto> getAllPosts(String email) {
         Member member = getMemberByEmail(email);
         Long memberId = member.getId(); // MemberId 추출
-        Region region = member.getRegion();
+        Region region = member.getRegion(); // 지역 추출
         Long memberRegionId = region.getId(); // 멤버의 RegionId 추출
         List<Post> posts = postRepository.findByRegion_Id(memberRegionId);
-        return convertPostsToDto(posts, memberId);
+        return convertPostsToDto(posts, memberId, email);
     }
 
-    // 사용자가 등록한 게시물 조회
+    public void getPostById(String email) {
+        getMemberByEmail(email);
+    }
+
+        // 사용자가 등록한 게시물 조회
     public List<PostResponseDto> getPostsByMemberId(String email) {
         Member member = getMemberByEmail(email);
         Long memberId = member.getId();
         List<Post> posts = postRepository.findByMember_Id(memberId);
-        return convertPostsToDto(posts, memberId);
+        return convertPostsToDto(posts, memberId, email);
     }
 
     // 사용자가 좋아요 누른 게시물 조회
@@ -66,7 +71,7 @@ public class CommonPostService {
         List<Post> posts = postLikeRepository.findByMember_Id(memberId).stream()
                 .map(PostLike::getPost)
                 .collect(Collectors.toList());
-        return convertPostsToDto(posts, memberId);
+        return convertPostsToDto(posts, memberId, email);
     }
 
     // 키워드로 게시물 조회
@@ -105,7 +110,7 @@ public class CommonPostService {
     private List<PostResponseDto> getPostResponseDtos(String email, List<Post> posts) {
         Member member = getMemberByEmail(email);
         Long memberId = member.getId();
-        return convertPostsToDto(posts, memberId);
+        return convertPostsToDto(posts, memberId, email);
     }
 }
 
