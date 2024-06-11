@@ -29,10 +29,18 @@ public class S3Service {
         this.amazonS3 = amazonS3;
     }
 
-    public String upload(String dirName, String fileName, MultipartFile multipartFile) throws IOException { // dirName의 디렉토리가 S3 Bucket 내부에 생성됨
-        File uploadFile = convert(multipartFile)
-                .orElseThrow(() -> new IllegalArgumentException("MultipartFile -> File 전환 실패"));
-        return upload(dirName, fileName, uploadFile);
+    public String upload(String dirName, String fileName, MultipartFile multipartFile) throws IOException {
+        try {
+            File uploadFile = convert(multipartFile)
+                    .orElseThrow(() -> new IllegalArgumentException("MultipartFile -> File 전환 실패: 파일 변환 중 예외 발생"));
+            return upload(dirName, fileName, uploadFile);
+        } catch (RuntimeException e) {
+            log.error("알 수 없는 예외 발생: 파일 업로드 실패. 디렉토리 이름: {}, 파일 이름: {}, 원본 파일 이름: {}, 에러 메시지: {}",
+                    dirName, fileName, multipartFile.getOriginalFilename(), e.getMessage(), e);
+            throw new RuntimeException("파일 업로드 중 알 수 없는 예외 발생. 디렉토리 이름: " + dirName +
+                    ", 파일 이름: " + fileName + ", 원본 파일 이름: " + multipartFile.getOriginalFilename() +
+                    ", 에러 메시지: " + e.getMessage(), e);
+        }
     }
 
     private String upload(String dirName, String fileName, File uploadFile) {
