@@ -2,9 +2,11 @@ package com.SafeNet.Backend.domain.messageroom.service;
 
 import com.SafeNet.Backend.domain.member.entity.Member;
 import com.SafeNet.Backend.domain.member.repository.MemberRepository;
+import com.SafeNet.Backend.domain.message.dto.MessageDto;
 import com.SafeNet.Backend.domain.message.entity.Message;
 import com.SafeNet.Backend.domain.message.dto.MessageResponseDto;
 import com.SafeNet.Backend.domain.message.repository.MessageRepository;
+import com.SafeNet.Backend.domain.message.service.MessageService;
 import com.SafeNet.Backend.domain.messageroom.entity.MessageRoom;
 import com.SafeNet.Backend.domain.messageroom.dto.MessageRoomDto;
 import com.SafeNet.Backend.domain.messageroom.repository.MessageRoomRepository;
@@ -12,6 +14,7 @@ import com.SafeNet.Backend.domain.post.entity.Post;
 import com.SafeNet.Backend.domain.post.exception.PostException;
 import com.SafeNet.Backend.domain.post.repository.PostRepository;
 import com.SafeNet.Backend.global.exception.CustomException;
+import com.SafeNet.Backend.global.pubsub.RedisPublisher;
 import com.SafeNet.Backend.global.pubsub.RedisSubscriber;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +26,7 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
@@ -38,6 +42,9 @@ public class MessageRoomService {
 
     private HashOperations<String, String, MessageRoomDto> opsHashMessageRoom;
     private Map<String, ChannelTopic> topics;
+    private final RedisPublisher redisPublisher; // RedisPublisher 주입
+
+    private final MessageService messageService;
 
     private static final String Message_Rooms = "MESSAGE_ROOM"; // Redis에 채팅방 데이터를 저장하기 위한 해시맵의 키
 
@@ -48,7 +55,9 @@ public class MessageRoomService {
             MemberRepository memberRepository,
             RedisMessageListenerContainer redisMessageListener,
             RedisSubscriber redisSubscriber,
-            @Qualifier("customRedisTemplate") RedisTemplate<String, Object> redisTemplate) {
+            @Qualifier("customRedisTemplate") RedisTemplate<String, Object> redisTemplate,
+            RedisPublisher redisPublisher,
+            MessageService messageService) {
         this.messageRoomRepository = messageRoomRepository;
         this.messageRepository = messageRepository;
         this.postRepository = postRepository;
@@ -56,6 +65,8 @@ public class MessageRoomService {
         this.redisMessageListener = redisMessageListener;
         this.redisSubscriber = redisSubscriber;
         this.redisTemplate = redisTemplate;
+        this.redisPublisher = redisPublisher;
+        this.messageService = messageService;
     }
 
     @PostConstruct
@@ -127,15 +138,14 @@ public class MessageRoomService {
         List<MessageResponseDto> messageRoomDtos = new ArrayList<>();
 
         for (MessageRoom messageRoom : messageRooms) {
-            //  member가 sender인 경우
-            if (member.getName().equals(messageRoom.getSender())) {
+            if (member.getName().equals(messageRoom.getSender())) { //  member가 sender인 경우
                 // 가장 최신 메시지 & 생성 시간 조회
                 // TimeStamped 클래스에서 설정해둔 보낸 시간(sentTime)을 통해 각 채팅방에서 가장 최근 메시지와 그 메시지가 보내진 시간을 꺼낸다.
                 Message latestMessage = messageRepository.findTopByMessageRoom_RoomIdOrderBySentTimeDesc(messageRoom.getRoomId());
                 MessageResponseDto messageRoomDto = setLatestMessage(messageRoom, latestMessage, messageRoom.getReceiver());
                 messageRoomDtos.add(messageRoomDto);
 
-            } else {  // user가 receiver인 경우
+            } else if (member.getName().equals(messageRoom.getReceiver()) || messageRoom.isFirstMessageSent()) {  // user가 receiver이면서 첫번째 메시지가 있는 경우
                 // 가장 최신 메시지 & 생성 시간 조회
                 Message latestMessage = messageRepository.findTopByMessageRoom_RoomIdOrderBySentTimeDesc(messageRoom.getRoomId());
                 MessageResponseDto messageRoomDto = setLatestMessage(messageRoom, latestMessage, messageRoom.getSender());
@@ -267,18 +277,47 @@ public class MessageRoomService {
     }
 
     // 쪽지방 입장
-    public void enterMessageRoom(String roomId) {
+    public void enterMessageRoom(String roomId, String username) {
         ChannelTopic topic = topics.get(roomId);
 
         if (topic == null) {
             topic = new ChannelTopic(roomId);
             redisMessageListener.addMessageListener(redisSubscriber, topic);
             topics.put(roomId, topic);
+
+            // 입장 메시지 추가 (채팅방에 처음 입장하는 경우)
+            MessageDto enterMessage = MessageDto.builder()
+                    .sender(username) // 메시지 보낸 사람으로 username 설정
+                    .roomId(roomId)
+                    .message(username + "이(가) 채팅방에 입장했습니다")
+                    .sentTime(LocalDateTime.now().toString())
+                    .build();
+            redisPublisher.publish(topic, enterMessage);
         }
     }
 
     // redis 채널에서 쪽지방 조회
     public ChannelTopic getTopic(String roomId) {
         return topics.get(roomId);
+    }
+
+    public void handleMessage(String roomId, String username, MessageDto messageDto) {
+        // 클라이언트 채팅방(topic) 입장, 대화를 위해 리스너와 연동
+        enterMessageRoom(roomId, username);
+
+        // 메시지 전송 로직
+        MessageDto messageWithTime = MessageDto.builder()
+                .sender(messageDto.getSender())
+                .roomId(messageDto.getRoomId())
+                .message(messageDto.getMessage())
+                .sentTime(LocalDateTime.now().toString())
+                .build();
+
+        // Websocket에 발행된 메시지를 redis로 발행한다(publish)
+        // 해당 쪽지방을 구독(subscribe)한 클라이언트에게 메시지가 실시간 전송
+        redisPublisher.publish(getTopic(messageDto.getRoomId()), messageWithTime);
+
+        // DB와 Redis에 메시지 저장
+        messageService.saveMessage(messageDto);
     }
 }
