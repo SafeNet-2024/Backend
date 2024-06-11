@@ -59,7 +59,7 @@ public class PostService {
                     .build();
             postRepository.save(post);
         } catch (Exception e) {
-            throw new PostException("Failed to create post", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new PostException("Failed to create post : "+ e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
