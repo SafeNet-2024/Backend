@@ -127,15 +127,14 @@ public class MessageRoomService {
         List<MessageResponseDto> messageRoomDtos = new ArrayList<>();
 
         for (MessageRoom messageRoom : messageRooms) {
-            //  member가 sender인 경우
-            if (member.getName().equals(messageRoom.getSender())) {
+            if (member.getName().equals(messageRoom.getSender())) { //  member가 sender인 경우
                 // 가장 최신 메시지 & 생성 시간 조회
                 // TimeStamped 클래스에서 설정해둔 보낸 시간(sentTime)을 통해 각 채팅방에서 가장 최근 메시지와 그 메시지가 보내진 시간을 꺼낸다.
                 Message latestMessage = messageRepository.findTopByMessageRoom_RoomIdOrderBySentTimeDesc(messageRoom.getRoomId());
                 MessageResponseDto messageRoomDto = setLatestMessage(messageRoom, latestMessage, messageRoom.getReceiver());
                 messageRoomDtos.add(messageRoomDto);
 
-            } else {  // user가 receiver인 경우
+            } else if (member.getName().equals(messageRoom.getReceiver()) || messageRoom.isFirstMessageSent()){  // user가 receiver이면서 첫번째 메시지가 있는 경우
                 // 가장 최신 메시지 & 생성 시간 조회
                 Message latestMessage = messageRepository.findTopByMessageRoom_RoomIdOrderBySentTimeDesc(messageRoom.getRoomId());
                 MessageResponseDto messageRoomDto = setLatestMessage(messageRoom, latestMessage, messageRoom.getSender());

@@ -34,6 +34,12 @@ public class MessageService {
     public void saveMessage(MessageDto messageDto) {
         MessageRoom messageRoom = messageRoomRepository.findByRoomId(messageDto.getRoomId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 쪽지방이 존재하지 않습니다."));
+
+        if (!messageRoom.isFirstMessageSent()) {
+            messageRoom.setFirstMessageSent(true);
+            messageRoomRepository.save(messageRoom); // 첫 메시지 여부를 true로 업데이트
+        }
+
         Message message = Message.builder()
                 .sender(messageDto.getSender())
                 .messageRoom(messageRoom)

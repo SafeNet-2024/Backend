@@ -36,6 +36,9 @@ public class MessageRoom {
     @Column(nullable = false)
     private String receiver; // 채팅방 수신자
 
+    @Column(nullable = false)
+    private boolean firstMessageSent = false; // 보낸 메시지가 존재하는지
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt; // 현재 시간 자동 할당
@@ -50,4 +53,8 @@ public class MessageRoom {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
+
+    public void setFirstMessageSent(boolean firstMessageSent) {
+        this.firstMessageSent = firstMessageSent;
+    }
 }
