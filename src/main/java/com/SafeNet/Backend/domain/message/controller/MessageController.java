@@ -40,22 +40,10 @@ public class MessageController {
 
     // websocket "/pub/chat/message"로 들어오는 메시징을 처리한다.
     @MessageMapping("/chat/message")
-    public void message(@RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
-                        MessageDto messageDto) {
+    public void message(MessageDto messageDto) {
         try {
-            log.debug("Received ACCESS_TOKEN: {}", accessToken);
-            // Access Token 검증
-            if (accessToken != null && accessToken.startsWith("Bearer ")) {
-                String token = accessToken.substring(7);
-                if (jwtTokenProvider.validateToken(token)) {
-                    // 메시지 전송 로직 호출
-                    messageRoomService.handleMessage(messageDto.getRoomId(), messageDto.getSender(), messageDto);
-                } else {
-                    throw new AccessDeniedException("Invalid or expired token");
-                }
-            } else {
-                throw new AccessDeniedException("Missing or invalid ACCESS_TOKEN header!");
-            }
+            // 메시지 전송 로직 호출
+            messageRoomService.handleMessage(messageDto.getRoomId(), messageDto.getSender(), messageDto);
         } catch (Exception e) {
             log.error("Failed to send message: {}", e.getMessage());
             throw e;
