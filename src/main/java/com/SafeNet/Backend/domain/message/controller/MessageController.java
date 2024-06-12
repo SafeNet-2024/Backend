@@ -44,11 +44,17 @@ public class MessageController {
                         MessageDto messageDto) {
         try {
             // Access Token 검증
-            if (accessToken == null || !jwtTokenProvider.validateToken(accessToken)) { // 메시지 전송 전 유효한 토큰인지 검증
-                throw new AccessDeniedException("Invalid or expired token");
+            if (accessToken != null && accessToken.startsWith("Bearer ")) {
+                String token = accessToken.substring(7);
+                if (jwtTokenProvider.validateToken(token)) {
+                    // 메시지 전송 로직 호출
+                    messageRoomService.handleMessage(messageDto.getRoomId(), messageDto.getSender(), messageDto);
+                } else {
+                    throw new AccessDeniedException("Invalid or expired token");
+                }
+            } else {
+                throw new AccessDeniedException("Missing or invalid ACCESS_TOKEN header");
             }
-            // 메시지 전송 로직 호출
-            messageRoomService.handleMessage(messageDto.getRoomId(), messageDto.getSender(), messageDto);
         } catch (Exception e) {
             log.error("Failed to send message: {}", e.getMessage());
             throw e;
