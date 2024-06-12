@@ -43,6 +43,7 @@ public class MessageController {
     public void message(@RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
                         MessageDto messageDto) {
         try {
+            log.debug("Received ACCESS_TOKEN: {}", accessToken);
             // Access Token 검증
             if (accessToken != null && accessToken.startsWith("Bearer ")) {
                 String token = accessToken.substring(7);
@@ -53,7 +54,7 @@ public class MessageController {
                     throw new AccessDeniedException("Invalid or expired token");
                 }
             } else {
-                throw new AccessDeniedException("Missing or invalid ACCESS_TOKEN header");
+                throw new AccessDeniedException("Missing or invalid ACCESS_TOKEN header!");
             }
         } catch (Exception e) {
             log.error("Failed to send message: {}", e.getMessage());
