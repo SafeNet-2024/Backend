@@ -33,3 +33,6 @@ public class WebSockConfig implements WebSocketMessageBrokerConfigurer {
                 .withSockJS();
     }
 }
+
+// WebSocket 메시지의 헤더에서 ACCESS_TOKEN을 추출하고 검증
+// 유효한 토큰이 있는 경우 사용자 인증 정보를 설정하고, 유효하지 않은 경우 연결을 차단
