@@ -29,8 +29,14 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-        if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+
+        if (StompCommand.CONNECT.equals(accessor.getCommand()) ||
+                StompCommand.SUBSCRIBE.equals(accessor.getCommand()) ||
+                StompCommand.SEND.equals(accessor.getCommand())) {
+
             String token = accessor.getFirstNativeHeader("ACCESS_TOKEN");
+            log.debug("Received ACCESS_TOKEN in Interceptor: {}", token);
+
             try {
                 if (token != null && token.startsWith("Bearer ")) {
                     token = token.substring(7);
@@ -48,6 +54,7 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
                 throw e;
             }
         }
+
         return message;
     }
 }
