@@ -42,14 +42,17 @@ public class MessageController {
     @MessageMapping("/chat/message")
     public void message(@RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
                         MessageDto messageDto) {
-
-        // Access Token 검증
-        if (accessToken == null || !jwtTokenProvider.validateToken(accessToken)) { // 메시지 전송 전 유효한 토큰인지 검증
-            throw new AccessDeniedException("Invalid or expired token");
+        try {
+            // Access Token 검증
+            if (accessToken == null || !jwtTokenProvider.validateToken(accessToken)) { // 메시지 전송 전 유효한 토큰인지 검증
+                throw new AccessDeniedException("Invalid or expired token");
+            }
+            // 메시지 전송 로직 호출
+            messageRoomService.handleMessage(messageDto.getRoomId(), messageDto.getSender(), messageDto);
+        } catch (Exception e) {
+            log.error("Failed to send message: {}", e.getMessage());
+            throw e;
         }
-
-        // 메시지 전송 로직 호출
-        messageRoomService.handleMessage(messageDto.getRoomId(), messageDto.getSender(), messageDto);
     }
 
     // 대화 내역 조회
