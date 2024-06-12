@@ -31,9 +31,7 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
         if (StompCommand.CONNECT.equals(accessor.getCommand()) ||
-                StompCommand.SUBSCRIBE.equals(accessor.getCommand()) ||
-                StompCommand.SEND.equals(accessor.getCommand())) {
-
+                StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {
             String token = accessor.getFirstNativeHeader("ACCESS_TOKEN");
             log.debug("Received ACCESS_TOKEN in Interceptor: {}", token);
 
