@@ -29,8 +29,8 @@ public class Message {
     @Column(nullable = false)
     private String sender;
 
-    @Column(nullable = false)
-    private String receiver;
+//    @Column(nullable = false)
+//    private String receiver;
 
     @Column(nullable = false)
     private String message;
