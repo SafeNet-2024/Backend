@@ -48,8 +48,9 @@ public class MessageService {
                 .build();
         messageRepository.save(message);
 
+        // Redis에 저장 (직렬화)
         redisTemplateMessage.setValueSerializer(new Jackson2JsonRedisSerializer<>(MessageDto.class));
-        redisTemplateMessage.opsForList().rightPush(messageDto.getRoomId(), messageDto);
+        redisTemplateMessage.opsForList().rightPush(messageDto.getRoomId(), messageDto); // 직렬화된 데이터 저장
         redisTemplateMessage.expire(messageDto.getRoomId(), 24, TimeUnit.HOURS); // redis에서 24시간마다 삭제
     }
 
@@ -63,13 +64,12 @@ public class MessageService {
     public List<MessageDto> loadMessage(String roomId) {
         List<MessageDto> messageList = new ArrayList<>();
 
-        // 1.
+        // 1. Redis에서 데이터 가져오기 (역직렬화)
         List<MessageDto> redisMessageList = redisTemplateMessage.opsForList().range(roomId, 0, 99);
 
-        // 2.
+        // 2. Redis에 데이터가 없으면, DB에서 데이터 가져오기 및 Redis에 저장 (직렬화)
         if (redisMessageList == null || redisMessageList.isEmpty()) {
             List<Message> dbMessageList = messageRepository.findTop100ByMessageRoom_RoomIdOrderBySentTimeAsc(roomId);
-            // 3.
             for (Message message : dbMessageList) {
                 MessageDto messageDto = MessageDto.builder()
                         .sender(message.getSender())
@@ -78,12 +78,13 @@ public class MessageService {
                         .sentTime(message.getSentTime().toString())
                         .build();
                 messageList.add(messageDto);
-                redisTemplateMessage.setValueSerializer(new Jackson2JsonRedisSerializer<>(Message.class));      // 직렬화
-                redisTemplateMessage.opsForList().rightPush(roomId, messageDto); // redis 저장
-                redisTemplateMessage.expire(roomId, 24, TimeUnit.HOURS); // redis에서 24시간마다 삭제
+                redisTemplateMessage.setValueSerializer(new Jackson2JsonRedisSerializer<>(MessageDto.class)); // 직렬화
+                redisTemplateMessage.opsForList().rightPush(roomId, messageDto); // 직렬화된 데이터 저장
             }
-        } else { // 4. 뒤쪽에 데이터 붙이기
+            redisTemplateMessage.expire(roomId, 24, TimeUnit.HOURS); // 메시지 만료 시간 24시간 설정
+        } else { // 4. Redis에서 읽어온 데이터 사용 (역직렬화), 뒤쪽에 데이터 붙이기
             messageList.addAll(redisMessageList);
+            redisTemplateMessage.expire(roomId, 24, TimeUnit.HOURS); // 만료 시간 연장
         }
         return messageList;
     }
