@@ -310,7 +310,6 @@ public class MessageRoomService {
                 .sender(messageDto.getSender())
                 .roomId(messageDto.getRoomId())
                 .message(messageDto.getMessage())
-                .sentTime(LocalDateTime.now().toString())
                 .build();
 
         // Websocket에 발행된 메시지를 redis로 발행한다(publish)
