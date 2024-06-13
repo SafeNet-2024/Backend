@@ -60,7 +60,7 @@ public class Post {
     private LocalDateTime created;
 
     @UpdateTimestamp
-    @Column(nullable = false)
+    @Column(name = "updated_at")
     private LocalDateTime updated;
 
     @Enumerated(EnumType.STRING)
