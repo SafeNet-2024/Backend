@@ -31,6 +31,7 @@ public class MessageService {
         this.messageRepository = messageRepository;
         this.messageRoomRepository = messageRoomRepository;
     }
+
     public void saveMessage(MessageDto messageDto) {
         MessageRoom messageRoom = messageRoomRepository.findByRoomId(messageDto.getRoomId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 쪽지방이 존재하지 않습니다."));
@@ -49,7 +50,7 @@ public class MessageService {
 
         redisTemplateMessage.setValueSerializer(new Jackson2JsonRedisSerializer<>(MessageDto.class));
         redisTemplateMessage.opsForList().rightPush(messageDto.getRoomId(), messageDto);
-        redisTemplateMessage.expire(messageDto.getRoomId(), 1, TimeUnit.HOURS); // redis에서 1시간마다 삭제
+        redisTemplateMessage.expire(messageDto.getRoomId(), 24, TimeUnit.HOURS); // redis에서 24시간마다 삭제
     }
 
     /**
@@ -78,7 +79,8 @@ public class MessageService {
                         .build();
                 messageList.add(messageDto);
                 redisTemplateMessage.setValueSerializer(new Jackson2JsonRedisSerializer<>(Message.class));      // 직렬화
-                redisTemplateMessage.opsForList().rightPush(roomId, messageDto);                                // redis 저장
+                redisTemplateMessage.opsForList().rightPush(roomId, messageDto); // redis 저장
+                redisTemplateMessage.expire(roomId, 24, TimeUnit.HOURS); // redis에서 24시간마다 삭제
             }
         } else { // 4. 뒤쪽에 데이터 붙이기
             messageList.addAll(redisMessageList);
