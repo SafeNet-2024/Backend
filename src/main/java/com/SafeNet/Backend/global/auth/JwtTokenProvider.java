@@ -35,8 +35,8 @@ public class JwtTokenProvider {
     @Value("${jwt.secret.key}")
     private String secretKey;
     private Key key;
-    //AccessToken 유효기한 : 1시간
-    private long accessExpirationTime =  1000 * 60 * 60;
+    //AccessToken 유효기한 : 1일
+    private long accessExpirationTime =  1000 * 60 * 60 * 24;
     //RefreshToken 유효기한 : 1주
     private long refreshExpirationTime = 1000 * 60 * 60 * 24 * 7;;
 
