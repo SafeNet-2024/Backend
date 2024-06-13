@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;  // 로깅을 위해 추가
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.security.access.AccessDeniedException;
@@ -59,10 +60,16 @@ public class MessageController {
             @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content(mediaType = "application/json"))
     })
     @Parameter(name = "roomId", description = "메시지를 조회할 채팅방의 ID", required = true, example = "123")
-    public ResponseEntity<List<MessageDto>> loadMessage(
+    public ResponseEntity<?> loadMessage(
             @RequestHeader(name = "ACCESS_TOKEN", required = false) String accessToken,
             @RequestHeader(name = "REFRESH_TOKEN", required = false) String refreshToken,
             @PathVariable String roomId) {
-        return ResponseEntity.ok(messageService.loadMessage(roomId));
+        try {
+            List<MessageDto> messages = messageService.loadMessage(roomId);
+            return ResponseEntity.ok(messages);
+        } catch (Exception e) {
+            log.error("Failed to load messages for room {}: {}", roomId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to load messages: " + e.getMessage());
+        }
     }
 }
