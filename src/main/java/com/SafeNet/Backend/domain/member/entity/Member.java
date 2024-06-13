@@ -28,6 +28,7 @@ import static jakarta.persistence.FetchType.LAZY;
 @Entity
 @Table(name = "member")
 public class Member extends BaseTimeEntity implements UserDetails {
+    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
@@ -40,10 +41,9 @@ public class Member extends BaseTimeEntity implements UserDetails {
     @Column(name = "name", nullable = false, unique = true, length = 100)
     private String name;
 
-    @Column(name = "phoneNumber")
     private String phoneNumber;
 
-    @Column(name = "pwd",nullable = false)
+    @Column(nullable = false)
     @NotNull
     private String pwd;
 
@@ -69,10 +69,6 @@ public class Member extends BaseTimeEntity implements UserDetails {
     @JsonIgnore
     private List<PostLike> postLikeList;
 
-    public Long getId() {
-        return id;
-    }
-
     public void updateProfile(String name, String phoneNumber, String password, Region region) {
         this.name = name;
         this.phoneNumber = phoneNumber;
@@ -89,25 +85,30 @@ public class Member extends BaseTimeEntity implements UserDetails {
     public String getPassword() {
         return this.pwd;
     }
+
     @Override
     public String getUsername() {
         return this.email;
     }
+
     // 계정 만료되었는지 (true - 만료 안됨)
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
+
     // 계정 잠겨있는지 (true - 안잠김)
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
+
     // 계정 비밀번호 만료되었는지 (true - 만료 X)
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
+
     // 계정 활성화 상태인지 (true - 활성화)
     @Override
     public boolean isEnabled() {
