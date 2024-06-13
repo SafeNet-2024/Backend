@@ -43,6 +43,7 @@ public class MessageService {
         Message message = Message.builder()
                 .sender(messageDto.getSender())
                 .messageRoom(messageRoom)
+                .receiver(messageRoom.getReceiver())
                 .message(messageDto.getMessage())
                 .build();
         messageRepository.save(message);
