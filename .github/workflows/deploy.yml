@@ -9,10 +9,11 @@ name: Deploy
 
 on:
   push:
-    branches: [ "main" ]
+    branches-ignore: 
+      - '**' # 모든 브랜치의 푸시를 무시
   pull_request:
-    branches: [ "main" ]
-
+    branches-ignore:
+      - '**' # 모든 브랜치의 PR을 무시
 permissions:
   contents: read
 
