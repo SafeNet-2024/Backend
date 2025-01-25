@@ -1,6 +1,6 @@
 # 🌿 𝗚𝗿𝗼𝗦𝗵𝗮𝗿𝗲-𝗕𝗮𝗰𝗸𝗲𝗻𝗱 🌿
 
-> [GroShare 프로젝트 설명 바로 가기](https://github.com/SafeNet-2024)
+> [GroShare 프로젝트 설명 바로 가기](https://github.com/SafeNet-2024?view_as=public)
 
 </br> 
 
